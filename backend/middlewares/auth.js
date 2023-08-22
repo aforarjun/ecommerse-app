@@ -1,10 +1,10 @@
 import ErrorHandler from "../utils/ErrorHandler.js";
-import catchAsyncErrors from "./catchAsyncErrors.js";
+import CatchAsyncError from "./catchAsyncErrors.js";
 import jwt from "jsonwebtoken";
 import User from "../model/user.js";
 // import Shop from "../model/shop.js";
 
-export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
+export const isAuthenticatedUser = CatchAsyncError(async (req, res, next) => {
   const { token } = req.cookies;
 
   if (!token) {
@@ -18,7 +18,7 @@ export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
   next();
 });
 
-// export const isSeller = catchAsyncErrors(async (req, res, next) => {
+// export const isSeller = CatchAsyncError(async (req, res, next) => {
 //   const { seller_token } = req.cookies;
 //   if (!seller_token) {
 //     return next(new ErrorHandler("Please login to continue", 401));
@@ -31,13 +31,14 @@ export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
 //   next();
 // });
 
-export const isAdmin = (...roles) => {
+export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
         new ErrorHandler(`${req.user.role} can not access this resources!`)
       );
     }
+
     next();
   };
 };

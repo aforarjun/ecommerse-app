@@ -1,12 +1,27 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { LoginSchema } from '../utils/formSchema';
-import { InputText, InputPassword, Checkbox } from '../components/input-components';
-import styles from '../styles/styles';
-import Button from '../components/Button';
+import { LoginSchema } from '../../utils/formSchema';
+import { InputText, InputPassword, Checkbox } from '../../components/input-components';
+import styles from '../../styles/styles';
+import Button from '../../components/Button';
+import { toast } from 'react-toastify';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { loginUser } from '../../redux/reducers/userSlice';
 
 function LoginPage() {
+    const dispatch = useAppDispatch();
+    const { isAuthenticated, isLoading } = useAppSelector(state => state.user);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/')
+        }
+    }, [isAuthenticated, navigate])
+
+
     const {
         control,
         handleSubmit,
@@ -20,8 +35,15 @@ function LoginPage() {
         }
     });
 
-    const Login = (data: any) => {
-        console.log(data)
+    const Login = async (data: any) => {
+        const { payload } = await dispatch(loginUser({ ...data }));
+
+        if (payload.success) {
+            navigate('/');
+            toast.success("LoggedIn successfully")
+        } else {
+            toast.error(payload.data.message)
+        }
     };
 
     return (
@@ -65,7 +87,11 @@ function LoginPage() {
                                 </div>
                             </div>
 
-                            <Button title="Sign In" type="submit" />
+                            <Button
+                                title="Sign In"
+                                type="submit"
+                                loading={isLoading}
+                            />
 
                             <div className={`${styles.noramlFlex} w-full`}>
                                 <h4>Not have any account?</h4>

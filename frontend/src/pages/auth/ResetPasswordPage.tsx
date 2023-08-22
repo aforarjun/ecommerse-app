@@ -2,8 +2,8 @@ import * as yup from 'yup';
 import { redirect, useParams } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import Button from '../components/Button';
-import { InputPassword } from '../components/input-components';
+import Button from '../../components/Button';
+import { InputPassword } from '../../components/input-components';
 import axios from 'axios';
 
 const ResetPassword = yup

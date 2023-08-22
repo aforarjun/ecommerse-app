@@ -5,12 +5,18 @@ import cors from "cors";
 import dotenv from 'dotenv';
 import ErrorMiddleware from "./middlewares/error.js";
 
+// *********Importing routes************
+import user from "./routes/userRoutes.js";
+
 const app = express();
 
 
-app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/test", (req, res) => {
@@ -23,9 +29,6 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
     path: "config/.env",
   });
 }
-
-// *********Importing routes************
-import user from "./routes/userRoutes.js";
 
 
 // ******* Creating route Apis ***********

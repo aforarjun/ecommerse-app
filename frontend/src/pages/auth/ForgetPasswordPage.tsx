@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import isEmailValidator from 'validator/lib/isEmail';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 
 const ForgetPasswordPage = () => {
     const [validate, setValidate] = useState<boolean>(true);
