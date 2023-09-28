@@ -5,10 +5,11 @@ import { axiosInstance } from '../../server';
 interface UserInterface {
   isAuthenticated: boolean;
   user: User | null;
+  isUserLoaded: boolean;
   isLoading: boolean;
-  error: null;
+  error: string;
   addressloading: boolean;
-  successMessage: string | null;
+  successMessage: string;
   usersLoading: boolean;
   users: User[];
 }
@@ -16,10 +17,11 @@ interface UserInterface {
 const initialState: UserInterface = {
   isAuthenticated: false,
   user: null,
+  isUserLoaded: true,
   isLoading: false,
-  error: null,
+  error: '',
   addressloading: false,
-  successMessage: null,
+  successMessage: '',
   usersLoading: false,
   users: []
 };
@@ -30,22 +32,20 @@ const userSlice = createSlice({
   reducers: {
     // Clear Errors and Messages
     clearErrors: (state) => {
-      state.error = null;
+      state.error = '';
     },
     clearMessages: (state) => {
-      state.successMessage = null;
+      state.successMessage = '';
     }
   },
   extraReducers: (builder) => {
     // Register request
     builder
-      .addCase(registerRequest.pending, (state, { payload }) => {
+      .addCase(registerRequest.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(registerRequest.fulfilled, (state, { payload }: any) => {
-        state.isAuthenticated = payload.user.isVerified;
         state.isLoading = false;
-        state.user = payload.user;
         state.successMessage = payload.message;
       })
       .addCase(registerRequest.rejected, (state, { payload }: any) => {
@@ -55,11 +55,11 @@ const userSlice = createSlice({
 
     // activate user / register user
     builder
-      .addCase(activateUser.pending, (state, { payload }) => {
+      .addCase(activateUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(activateUser.fulfilled, (state, { payload }) => {
-        state.isAuthenticated = payload.user.isVerified;
+        state.isAuthenticated = true;
         state.isLoading = false;
         state.user = payload.user;
         state.successMessage = payload.message;
@@ -72,7 +72,7 @@ const userSlice = createSlice({
 
     // login user
     builder
-      .addCase(loginUser.pending, (state, { payload }) => {
+      .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, { payload }) => {
@@ -108,31 +108,60 @@ const userSlice = createSlice({
     builder
       .addCase(loadUser.pending, (state, { payload }) => {
         state.isLoading = true;
+        state.isUserLoaded = true;
       })
       .addCase(loadUser.fulfilled, (state, { payload }: any) => {
-        state.isAuthenticated = payload.user.isVerified;
+        state.isAuthenticated = true;
         state.user = payload.user;
         state.successMessage = payload.message;
         state.isLoading = false;
+        state.isUserLoaded = false;
       })
       .addCase(loadUser.rejected, (state, { payload }: any) => {
         state.isAuthenticated = false;
         state.isLoading = false;
+        state.isUserLoaded = false;
         state.error = payload.data.message;
       });
 
     // Update user
     builder
-      .addCase(updateUser.pending, (state, { payload }) => {
-        state.isLoading = true;
-      })
       .addCase(updateUser.fulfilled, (state, { payload }: any) => {
-        state.isLoading = false;
-        state.user = null;
+        state.user = payload.user;
         state.successMessage = payload.message;
       })
       .addCase(updateUser.rejected, (state, { payload }: any) => {
         state.isLoading = false;
+        state.error = payload.data.message;
+      });
+
+    // Update user Avatar
+    builder
+      .addCase(updateUserAvatar.fulfilled, (state, { payload }: any) => {
+        state.user = payload.user;
+        state.successMessage = payload.message;
+      })
+      .addCase(updateUserAvatar.rejected, (state, { payload }: any) => {
+        state.error = payload.data.message;
+      });
+
+    // Update user Avatar
+    builder
+      .addCase(updateUserAddress.fulfilled, (state, { payload }: any) => {
+        state.user = payload.user;
+        state.successMessage = payload.message;
+      })
+      .addCase(updateUserAddress.rejected, (state, { payload }: any) => {
+        state.error = payload.data.message;
+      });
+
+    // Update user Avatar
+    builder
+      .addCase(deleteUserAddress.fulfilled, (state, { payload }: any) => {
+        state.user = payload.user;
+        state.successMessage = payload.message;
+      })
+      .addCase(deleteUserAddress.rejected, (state, { payload }: any) => {
         state.error = payload.data.message;
       });
   }
@@ -165,11 +194,12 @@ export const activateUser = createAsyncThunk(
   'user/activate',
   async (tokenData: any, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.post('/user/verify-user', tokenData, {
+      const { data } = await axiosInstance.post('/user/activate-user', tokenData, {
         withCredentials: true
       });
       return data;
     } catch (error: any) {
+      console.log(error.response.data);
       if (!error.response) {
         throw error;
       }
@@ -187,7 +217,6 @@ export const loginUser = createAsyncThunk(
       const { data } = await axiosInstance.post('/user/login-user', body, {
         withCredentials: true
       });
-      console.log(data);
       return data;
     } catch (error: any) {
       if (!error.response) {
@@ -200,9 +229,9 @@ export const loginUser = createAsyncThunk(
 );
 
 // 3. logout user
-export const logoutUser = createAsyncThunk('user/logout', async (_, { rejectWithValue }) => {
+export const logoutUser = createAsyncThunk('user/logoutUser', async (_, { rejectWithValue }) => {
   try {
-    const { data } = await axiosInstance.post('/user/logout-user');
+    const { data } = await axiosInstance.get('/user/logout-user');
 
     return data;
   } catch (error: any) {
@@ -218,7 +247,6 @@ export const logoutUser = createAsyncThunk('user/logout', async (_, { rejectWith
 export const loadUser = createAsyncThunk('user/loadUser', async (_, { rejectWithValue }) => {
   try {
     const { data } = await axiosInstance.get('/user/load-user', { withCredentials: true });
-    console.log(data);
     return data;
   } catch (error: any) {
     if (!error.response) {
@@ -232,30 +260,80 @@ export const loadUser = createAsyncThunk('user/loadUser', async (_, { rejectWith
 // 5. Update user
 export const updateUser = createAsyncThunk(
   'user/updateUser',
-  (
-    body: {
-      name: string;
-      email: string;
-      phoneNumber: number;
-    },
-    { rejectWithValue }
-  ) =>
-    async () => {
-      try {
-        const { data } = await axiosInstance.put('/user/update-user', body, {
-          withCredentials: true,
-          headers: {
-            'Access-Control-Allow-Credentials': true
-          }
-        });
-
-        return data;
-      } catch (error: any) {
-        if (!error.response) {
-          throw error;
-        }
-
-        return rejectWithValue(error.response);
+  async (body: any, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.put('/user/update-user', body, {
+        withCredentials: true
+      });
+      console.log('data', data);
+      return data;
+    } catch (error: any) {
+      console.log(error.response.data);
+      if (!error.response) {
+        throw error;
       }
+
+      return rejectWithValue(error.response);
     }
+  }
+);
+
+// 6. update user Profile Avatar
+export const updateUserAvatar = createAsyncThunk(
+  'user/updateUserAvatar',
+  async (body: any, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.put('/user/update-avatar', body, {
+        withCredentials: true
+      });
+
+      return data;
+    } catch (error: any) {
+      if (!error.response) {
+        throw error;
+      }
+
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
+// 7. update User Addresses
+export const updateUserAddress = createAsyncThunk(
+  'user/updateUserAddress',
+  async (body: any, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.put('/user/update-user-addresses', body, {
+        withCredentials: true
+      });
+
+      return data;
+    } catch (error: any) {
+      if (!error.response) {
+        throw error;
+      }
+
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
+// 7. update User Addresses
+export const deleteUserAddress = createAsyncThunk(
+  'user/deleteUserAddress',
+  async (addressId: any, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.delete(`/user/delete-user-address/${addressId}`, {
+        withCredentials: true
+      });
+
+      return data;
+    } catch (error: any) {
+      if (!error.response) {
+        throw error;
+      }
+
+      return rejectWithValue(error.response);
+    }
+  }
 );

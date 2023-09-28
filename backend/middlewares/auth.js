@@ -2,7 +2,7 @@ import ErrorHandler from "../utils/ErrorHandler.js";
 import CatchAsyncError from "./catchAsyncErrors.js";
 import jwt from "jsonwebtoken";
 import User from "../model/user.js";
-// import Shop from "../model/shop.js";
+import Seller from "../model/seller.js";
 
 export const isAuthenticatedUser = CatchAsyncError(async (req, res, next) => {
   const { token } = req.cookies;
@@ -18,20 +18,21 @@ export const isAuthenticatedUser = CatchAsyncError(async (req, res, next) => {
   next();
 });
 
-// export const isSeller = CatchAsyncError(async (req, res, next) => {
-//   const { seller_token } = req.cookies;
-//   if (!seller_token) {
-//     return next(new ErrorHandler("Please login to continue", 401));
-//   }
+export const isSeller = CatchAsyncError(async (req, res, next) => {
+  const { seller_token } = req.cookies;
 
-//   const decoded = jwt.verify(seller_token, process.env.JWT_SECRET_KEY);
+  if (!seller_token) {
+    return next(new ErrorHandler("Please login to continue", 401));
+  }
 
-//   req.seller = await Shop.findById(decoded.id);
+  const decoded = jwt.verify(seller_token, process.env.JWT_SECRET_KEY);
 
-//   next();
-// });
+  req.seller = await Seller.findById(decoded.id);
 
-export const authorizeRoles = (...roles) => {
+  next();
+});
+
+export const isAdmin = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(

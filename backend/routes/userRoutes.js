@@ -1,32 +1,35 @@
 import express from "express";
+import { upload } from "../multer/multer.js";
 
 import {
-    deleteUserAddress,
-    forgetPassword,
-    getAllUsers,
-    getUserDetails,
-    loadUser,
-    loginUser,
-    logoutUser,
-    resetPassword,
-    signupUser,
-    updatePassword,
-    updateUserAddresses,
-    updateUserAvatar,
-    verifyAccount,
+  deleteUser,
+  deleteUserAddress,
+  forgetPassword,
+  getAllUsers,
+  getUserDetails,
+  loadUser,
+  loginUser,
+  logoutUser,
+  resetPassword,
+  signupUser,
+  updatePassword,
+  updateUserAddresses,
+  updateUserAvatar,
+  activateAccount,
+  updateUser,
 } from "../controllers/userController.js";
 
-import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
+import { isAdmin, isAuthenticatedUser } from "../middlewares/auth.js";
 
 const router = express.Router();
 
 // register
-router.post("/create-user", signupUser);
-router.post("/verify-user", verifyAccount);
+router.post("/create-user", upload.single("file"), signupUser);
+router.post("/activate-user", activateAccount);
 
 // login - logout
 router.post("/login-user", loginUser);
-router.post("/logout-user", logoutUser);
+router.get("/logout-user", logoutUser);
 
 // password forget and the reset
 router.post("/forget-password", forgetPassword);
@@ -35,29 +38,37 @@ router.post("/reset-password", resetPassword);
 // Load user - LOGGEDIN USER
 router.get("/load-user", isAuthenticatedUser, loadUser);
 
-
 // Get user Details - ADMIN / LOGGEDIN USER
 router.get("/get-user/:userId", isAuthenticatedUser, getUserDetails);
 
 // Update a User Details    -   ADMIN / LOGGEDIN USER
-router.put("/update-user/:userId", isAuthenticatedUser, getAllUsers);
+router.put("/update-user", isAuthenticatedUser, updateUser);
 
 // Update password    -   LOGGEDIN USER
 router.put("/update-password/:userId", isAuthenticatedUser, updatePassword);
 
 // Delete User   -   LOGGEDIN USER
-router.post("/delete-user/:userId", isAuthenticatedUser, updatePassword);
+router.post("/delete-user/:userId", isAuthenticatedUser, deleteUser);
 
 // update user address
-router.put("/update-user-addresses/:userId", isAuthenticatedUser, updateUserAddresses)
+router.put("/update-user-addresses", isAuthenticatedUser, updateUserAddresses);
 
 // delete user address
-router.post("/delete-user-address/:userId", isAuthenticatedUser, deleteUserAddress)
+router.delete(
+  "/delete-user-address/:addressId",
+  isAuthenticatedUser,
+  deleteUserAddress
+);
 
 // Get all the users    - ADMIN
-router.get("/users", isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
+router.get("/users", isAuthenticatedUser, isAdmin("Admin"), getAllUsers);
 
 // Update User avatar
-router.put("/update-avatar", isAuthenticatedUser, updateUserAvatar)
+router.put(
+  "/update-avatar",
+  isAuthenticatedUser,
+  upload.single("file"),
+  updateUserAvatar
+);
 
 export default router;

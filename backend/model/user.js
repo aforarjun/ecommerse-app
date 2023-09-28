@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Please enter your email!"],
+    unique: true,
   },
   password: {
     type: String,
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
   phoneNumber: {
-    type: Number,
+    type: String,
   },
   addresses: [
     {
@@ -45,29 +46,15 @@ const userSchema = new mongoose.Schema({
   ],
   role: {
     type: String,
-    default: "user",
+    default: "User",
   },
   avatar: {
-    public_id: {
-      type: String,
-      required: true,
-    },
-    url: {
-      type: String,
-      required: true,
-    },
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
+    type: String,
   },
   createdAt: {
     type: Date,
     default: Date.now(),
   },
-
-  verifyToken: String,
-  verifyTokenExpiry: Date,
 
   resetPasswordToken: String,
   resetPasswordExpiry: Date,
@@ -94,7 +81,6 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-
 // ** IMPORTANT ** Generating reset password token **
 userSchema.methods.getResetPasswordToken = function () {
   // generating Token
@@ -110,6 +96,6 @@ userSchema.methods.getResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mint for reset password
 
   return resetToken;
-}
+};
 
 export default mongoose.model("User", userSchema);

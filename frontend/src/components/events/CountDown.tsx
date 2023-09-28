@@ -1,62 +1,64 @@
-import { useEffect, useState } from "react";
-import { axiosInstance } from "../../server";
+import { useEffect, useState } from 'react';
+import { useAppDispatch } from '../../redux/hook';
+// import { deleteEvent } from '../../redux/reducers/eventsSlice';
 
 const CountDown = ({ data }: any) => {
-    const [timeLeft, setTimeLeft] = useState<any>(calculateTimeLeft());
+  // const dispatch = useAppDispatch();
+  const [timeLeft, setTimeLeft] = useState<any>(calculateTimeLeft());
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setTimeLeft(calculateTimeLeft());
-        }, 1000);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
 
-        if (
-            typeof timeLeft.days === 'undefined' &&
-            typeof timeLeft.hours === 'undefined' &&
-            typeof timeLeft.minutes === 'undefined' &&
-            typeof timeLeft.seconds === 'undefined'
-        ) {
-            // axiosInstance(`/event/delete-shop-event/${data?._id}`);
-        }
-        return () => clearTimeout(timer);
-    });
+    if (
+      typeof timeLeft.days === 'undefined' &&
+      typeof timeLeft.hours === 'undefined' &&
+      typeof timeLeft.minutes === 'undefined' &&
+      typeof timeLeft.seconds === 'undefined'
+    ) {
+      // dispatch(deleteEvent(data?._id));
+    }
+    return () => clearTimeout(timer);
+  }, [data, new Date()]);
 
-    function calculateTimeLeft() {
-        const difference = +new Date(data?.Finish_Date) - +new Date();
-        let timeLeft = {};
+  function calculateTimeLeft() {
+    const difference = +new Date(data?.endDate) - +new Date();
+    let timeLeft = {};
 
-        if (difference > 0) {
-            timeLeft = {
-                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                minutes: Math.floor((difference / 1000 / 60) % 60),
-                seconds: Math.floor((difference / 1000) % 60),
-            };
-        }
-
-        return timeLeft;
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60)
+      };
     }
 
-    const timerComponents = Object.keys(timeLeft).map((interval) => {
-        if (!timeLeft[interval]) {
-            return null;
-        }
+    return timeLeft;
+  }
 
-        return (
-            <span className="text-[25px] text-[#475ad2]">
-                {timeLeft[interval]} {interval}{" "}
-            </span>
-        );
-    });
+  const timerComponents = Object.keys(timeLeft).map((interval) => {
+    if (!timeLeft[interval]) {
+      return null;
+    }
 
     return (
-        <div>
-            {timerComponents.length ? (
-                timerComponents
-            ) : (
-                <span className="text-[red] text-[25px]">Time's Up</span>
-            )}
-        </div>
+      <span className="text-[25px] text-[#475ad2]">
+        {timeLeft[interval]} {interval}{' '}
+      </span>
     );
-}
+  });
+
+  return (
+    <div>
+      {timerComponents.length ? (
+        timerComponents
+      ) : (
+        <span className="text-[red] text-[25px]">Time's Up</span>
+      )}
+    </div>
+  );
+};
 
 export default CountDown;
