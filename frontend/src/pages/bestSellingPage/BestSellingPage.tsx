@@ -12,7 +12,7 @@ const BestSellingPage = () => {
   const { allProducts, isLoading } = useAppSelector((state) => state.products);
 
   useEffect(() => {
-    const allProductsData = allProducts ? [...allProducts] : [];
+    const allProductsData = allProducts.length ? [...allProducts] : [];
     const sortedData = allProductsData?.sort((a: any, b: any) => b.sold_out - a.sold_out);
     setBestSellingProducts(sortedData);
   }, [allProducts]);

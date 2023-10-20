@@ -56,14 +56,7 @@ const sellerSchema = new mongoose.Schema({
     default: "Seller",
   },
   avatar: {
-    public_id: {
-      type: String,
-      required: true,
-    },
-    url: {
-      type: String,
-      required: true,
-    },
+    type: String,
   },
   isVerified: {
     type: Boolean,

@@ -134,7 +134,7 @@ const Header = ({ activeHeading }: any) => {
               <Navbar active={activeHeading} />
             </div>
 
-            {/* Right side cart / wishlist / user */}
+            {/* Right side - cart / wishlist / user */}
             <div className="flex">
               <div className={`${styles.noramlFlex}`}>
                 <button
@@ -142,7 +142,7 @@ const Header = ({ activeHeading }: any) => {
                   onClick={() => setOpenWishlist(true)}>
                   <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
                   <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                    {wishlist && wishlist.length}
+                    {wishlist.length}
                   </span>
                 </button>
               </div>
@@ -164,7 +164,7 @@ const Header = ({ activeHeading }: any) => {
                     <Link to="/profile">
                       <img
                         src={`${user?.avatar}`}
-                        className="w-[35px] h-[35px] rounded-full"
+                        className="w-[35px] h-[35px] rounded-full object-cover"
                         alt=""
                       />
                     </Link>

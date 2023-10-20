@@ -4,18 +4,20 @@ import { BsCartPlus } from 'react-icons/bs';
 import styles from '../../styles/styles';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { Link } from 'react-router-dom';
+import { addToCart } from '../../redux/reducers/cartSlice';
+import { removeFromWishlist } from '../../redux/reducers/wishlistSlice';
 
 const Wishlist = ({ setOpenWishlist }: any) => {
   const { wishlist } = useAppSelector((state) => state.wishlist);
   const dispatch = useAppDispatch();
 
   const removeFromWishlistHandler = (data: any) => {
-    // dispatch(removeFromWishlist(data));
+    dispatch(removeFromWishlist(data._id));
   };
 
   const addToCartHandler = (data: any) => {
-    const newData = { ...data, qty: 1 };
-    // dispatch(addTocart(newData));
+    dispatch(addToCart(data));
     setOpenWishlist(false);
   };
 
@@ -46,21 +48,20 @@ const Wishlist = ({ setOpenWishlist }: any) => {
               {/* Item length */}
               <div className={`${styles.noramlFlex} p-4`}>
                 <AiOutlineHeart size={25} />
-                <h5 className="pl-2 text-[20px] font-[500]">{wishlist && wishlist.length} items</h5>
+                <h5 className="pl-2 text-[20px] font-[500]">{wishlist?.length} items</h5>
               </div>
 
               {/* cart Single Items */}
               <br />
               <div className="w-full border-t">
-                {wishlist &&
-                  wishlist.map((i, index) => (
-                    <CartSingle
-                      key={index}
-                      data={i}
-                      removeFromWishlistHandler={removeFromWishlistHandler}
-                      addToCartHandler={addToCartHandler}
-                    />
-                  ))}
+                {wishlist?.map((i, index) => (
+                  <CartSingle
+                    key={index}
+                    data={i}
+                    removeFromWishlistHandler={removeFromWishlistHandler}
+                    addToCartHandler={addToCartHandler}
+                  />
+                ))}
               </div>
             </div>
           </>
@@ -82,13 +83,15 @@ const CartSingle = ({ data, removeFromWishlistHandler, addToCartHandler }: any) 
           onClick={() => removeFromWishlistHandler(data)}
         />
         <img
-          src={`${data?.images[0]?.url}`}
+          src={`${data?.images[0]}`}
           alt=""
           className="w-[130px] h-min ml-2 mr-2 rounded-[5px]"
         />
 
-        <div className="pl-[5px]">
-          <h1>{data.name}</h1>
+        <div className="pl-[5px] flex-1">
+          <Link to={`/product/${data._id}`}>
+            <h1 className="text-sm">{data.name}</h1>
+          </Link>
           <h4 className="font-[600] pt-3 800px:pt-[3px] text-[17px] text-[#d02222] font-Roboto">
             US${totalPrice}
           </h4>

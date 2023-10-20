@@ -14,6 +14,7 @@ export { default as BestSellingPage } from './bestSellingPage/BestSellingPage';
 export { default as FaqsPage } from './FaqsPage';
 export { default as ProfilePage } from './userProfilepage/ProfilePage';
 export { default as CheckoutPage } from './CheckoutPage';
+export { default as OrderDetails } from './order/OrderDetails';
 
 export { default as ShopPreviewPage } from './shop/shopPreviewPage';
 

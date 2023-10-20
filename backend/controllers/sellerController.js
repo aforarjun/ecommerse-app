@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "fs";
 import bcrypt from "bcryptjs";
 import Seller from "../model/seller.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
@@ -356,26 +358,35 @@ export const updateSeller = CatchAsyncError(async (req, res, next) => {
 
 // *************** update Seller avatar - LoggedIn Seller ***************
 export const updateSellerAvatar = CatchAsyncError(async (req, res, next) => {
+  if (!req.file) {
+    return next(new ErrorHandler("File not exist", 400));
+  }
+
   let existSeller = await Seller.findById(req.seller.id);
 
-  if (req.body.avatar !== "") {
-    // const imageId = existSeller.avatar.public_id;
-    // await cloudinary.v2.uploader.destroy(imageId);
-    // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-    //   folder: "avatars",
-    //   width: 150,
-    // });
-    // existSeller.avatar = {
-    //   public_id: myCloud.public_id,
-    //   url: myCloud.secure_url,
-    // };
+  // remove already exist image
+  if (existSeller.avatar) {
+    const existAvatar = existSeller.avatar.split(`${process.env.API_URL}/`)[1];
+    const __dirname = path.resolve();
+    fs.unlink(`${__dirname}/uploaded-images/${existAvatar}`, (err) => {
+      if (err) {
+        console.log(err, "File not deleted");
+      } else {
+        console.log("File deleted successfully");
+      }
+    });
   }
+
+  // upload new avatar
+  const filename = req.file.filename;
+  const fileUrl = path.join(filename);
+  existSeller.avatar = `${process.env.API_URL}/${fileUrl}`;
 
   await existSeller.save();
 
   res.status(200).json({
     success: true,
-    user: existSeller,
+    seller: existSeller,
   });
 });
 

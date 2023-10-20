@@ -1,7 +1,9 @@
+import fs from "fs";
 import CatchAsyncError from "../middlewares/catchAsyncErrors.js";
+import ErrorHandler from "../utils/ErrorHandler.js";
 import Product from "../model/product.js";
 import Seller from "../model/seller.js";
-import ErrorHandler from "../utils/ErrorHandler.js";
+import Order from "../model/order.js";
 
 // create product
 export const createProduct = CatchAsyncError(async (req, res, next) => {
@@ -10,13 +12,29 @@ export const createProduct = CatchAsyncError(async (req, res, next) => {
   const seller = await Seller.findById(sellerId);
 
   if (!seller) {
+    const files = req.files;
+    files.forEach((file) => {
+      const filename = file.filename;
+      const filePath = `/uploaded-images/${filename}`;
+
+      fs.unlink(filePath, (err) => {
+        if (err) console.log("Error deleting file");
+        else console.log("File deleted successfully");
+      });
+    });
+
     return next(new ErrorHandler("Seller id is invalid.", 401));
   }
 
-  const product = await Product.create({
-    ...req.body,
-    seller,
+  const files = req.files;
+  const storeImages = files.map((file) => {
+    const filename = file.filename;
+    return `${process.env.API_URL}/${filename}`;
   });
+  req.body.images = storeImages;
+  req.body.category = JSON.parse(req.body.category);
+
+  const product = await Product.create({ ...req.body, seller });
 
   res.status(201).json({
     success: true,
@@ -52,11 +70,11 @@ export const updateProduct = CatchAsyncError(async (req, res, next) => {
 
 // get a product details of a Seller
 export const getProductDetails = CatchAsyncError(async (req, res, next) => {
-  const id = req.params;
+  const { id } = req.params;
 
-  const product = await Product.findById({ _id: id });
+  const product = await Product.findById(id);
 
-  if (product) {
+  if (!product) {
     return next(new ErrorHandler("Product not exist", 400));
   }
 
@@ -151,11 +169,11 @@ export const reviewProduct = CatchAsyncError(async (req, res, netx) => {
 
   await product.save({ validateBeforeSave: false });
 
-  // await Order.findByIdAndUpdate(
-  //     orderId,
-  //     { $set: { "cart.$[elem].isReviewed": true } },
-  //     { arrayFilters: [{ "elem._id": productId }], new: true }
-  // );
+  await Order.findByIdAndUpdate(
+    orderId,
+    { $set: { "cart.$[elem].isReviewed": true } },
+    { arrayFilters: [{ "elem._id": productId }], new: true }
+  );
 
   res.status(200).json({
     success: true,

@@ -15,7 +15,7 @@ const productSchema = new mongoose.Schema({
     },
   ],
   category: {
-    index: Number,
+    index: String,
     value: String,
   },
   tags: {

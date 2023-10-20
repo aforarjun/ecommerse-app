@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -14,22 +13,7 @@ import { categoriesData } from '../../../static/data';
 import Button from '../../../components/Button';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { clearErrors, createProduct } from '../../../redux/reducers/productsSlice';
-
-const CreateProductSchema = yup.object().shape({
-  images: yup.array().of(yup.string()).required('Project Images is required, (Atleast one.)'),
-  name: yup.string().required('Project name is required.'),
-  description: yup.string().required('Project description is required.'),
-  category: yup
-    .object({
-      index: yup.number(),
-      value: yup.string()
-    })
-    .required('Project category is required.'),
-  tags: yup.string().required('Project tags is required.'),
-  originalPrice: yup.number().required('Required'),
-  discountPrice: yup.number().required('Required'),
-  stock: yup.number().required('Required')
-});
+import { CreateProductSchema } from '../../../utils/formSchema';
 
 const CreateProduct = () => {
   const { seller } = useAppSelector((state) => state.seller);
@@ -39,7 +23,7 @@ const CreateProduct = () => {
 
   useEffect(() => {
     dispatch(clearErrors());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (error) {
@@ -49,7 +33,7 @@ const CreateProduct = () => {
       toast.success('Product created successfully!');
       navigate('/seller/dashboard');
     }
-  }, [dispatch, error, success]);
+  }, [dispatch, error, success, navigate]);
 
   const {
     control,
@@ -63,9 +47,23 @@ const CreateProduct = () => {
   });
 
   const createProductHandle = async (data: any) => {
-    const createProductData = { ...data, sellerId: seller?._id };
+    const { category, description, discountPrice, images, name, originalPrice, stock, tags } = data;
 
-    await dispatch(createProduct(createProductData));
+    const newForm = new FormData();
+
+    for (const image of images) {
+      newForm.append('images', image);
+    }
+    newForm.append('description', description);
+    newForm.append('discountPrice', discountPrice);
+    newForm.append('name', name);
+    newForm.append('originalPrice', originalPrice);
+    newForm.append('sellerId', seller!._id);
+    newForm.append('stock', stock);
+    newForm.append('tags', tags);
+    newForm.append('category', JSON.stringify(category));
+
+    await dispatch(createProduct(newForm));
   };
 
   return (
@@ -87,11 +85,9 @@ const CreateProduct = () => {
           control={control}
           name="description"
           error={errors.description}
-          type="text"
+          type="textarea"
           label="Description"
           placeholder="Enter product Description..."
-          cols="30"
-          rows="8"
         />
         <br />
         <InputSelect

@@ -1,4 +1,5 @@
 import express from "express";
+import { upload } from "../multer/multer.js";
 import {
   createEvent,
   getEventDetails,
@@ -11,7 +12,7 @@ import { isSeller } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/create-event", isSeller, createEvent);
+router.post("/create-event", upload.array("images"), isSeller, createEvent);
 
 router.get("/get-event/:id", getEventDetails);
 router.get("/get-all-events", getAllEvents);

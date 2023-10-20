@@ -49,9 +49,10 @@ const Cart = ({ setOpenCart }: any) => {
               {/* cart Single Items */}
               <br />
               <div className="w-full border-t">
-                {cart?.map((item, index) => (
-                  <CartSingle key={index} data={item} dispatch={dispatch} />
-                ))}
+                {cart &&
+                  cart.map((item, index) => (
+                    <CartSingle key={index} data={item} dispatch={dispatch} />
+                  ))}
               </div>
             </div>
 
@@ -106,13 +107,12 @@ const CartSingle = ({ data, dispatch }: any) => {
           </div>
         </div>
         <img
-          src={`${cartItem?.images[0]?.url}`}
+          src={`${cartItem?.images[0]}`}
           alt=""
           className="w-[130px] h-min ml-2 mr-2 rounded-[5px]"
         />
-        d
-        <div className="pl-[5px]">
-          <h1>{cartItem.name}</h1>
+        <div className="pl-[5px] flex-1">
+          <h1 className="text-sm">{cartItem.name}</h1>
           <h4 className="font-[400] text-[15px] text-[#00000082]">
             ${cartItem.discountPrice} * {qty}
           </h4>

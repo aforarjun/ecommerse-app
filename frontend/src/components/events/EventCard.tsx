@@ -19,7 +19,7 @@ const EventCard = ({ active, data }: { active: boolean; data: Event }) => {
         toast.error('Product stock limited!');
       } else {
         const cartData = { ...data, qty: 1 };
-        // dispatch(addTocart(cartData));
+        dispatch(addTocart(cartData));
         toast.success('Item added to cart successfully!');
       }
     }
@@ -62,3 +62,6 @@ const EventCard = ({ active, data }: { active: boolean; data: Event }) => {
 };
 
 export default EventCard;
+function addTocart(cartData: any): any {
+  throw new Error('Function not implemented.');
+}

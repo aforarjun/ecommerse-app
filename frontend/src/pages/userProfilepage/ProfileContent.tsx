@@ -24,6 +24,8 @@ import {
   updateUserAddress,
   updateUserAvatar
 } from '../../redux/reducers/userSlice';
+import { getUserOrders } from '../../redux/reducers/ordersSlice';
+import { axiosInstance } from '../../server';
 
 const UserUpdateSchema = yup.object().shape({
   name: yup.string().default('').required('Name is required'),
@@ -129,7 +131,7 @@ export const ProfileSection = () => {
       <br />
       <br />
       <div className="w-full px-5">
-        <form onSubmit={handleSubmit(updateUserHandle)} aria-required={true}>
+        <form onSubmit={handleSubmit(updateUserHandle)}>
           <div className="w-full 800px:flex block pb-3 gap-2">
             <div className=" w-[100%] 800px:w-[50%]">
               <InputText
@@ -175,8 +177,12 @@ export const ProfileSection = () => {
 
 export const AllOrders = () => {
   const { user } = useAppSelector((state) => state.user);
-  const { orders } = useAppSelector((state) => state.order);
+  const { userOrders } = useAppSelector((state) => state.order);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getUserOrders(user!._id));
+  }, [user, dispatch]);
 
   const columns: any = [
     { field: 'id', headerName: 'Order ID', minWidth: 150, flex: 0.7 },
@@ -214,7 +220,7 @@ export const AllOrders = () => {
       sortable: false,
       renderCell: (params: any) => {
         return (
-          <Link to={`/user/order/${params.id}`}>
+          <Link to={`/profile/order/${params.id}`}>
             <Button icon={<AiOutlineArrowRight size={20} />} />
           </Link>
         );
@@ -223,22 +229,14 @@ export const AllOrders = () => {
   ];
   const row: any = [];
 
-  useEffect(() => {
-    const getOrders = async () => {
-      // dispatch(getAllOrdersOfUser(user._id));
-
-      orders &&
-        orders.forEach((item: any) => {
-          row.push({
-            id: item._id,
-            itemsQty: item.cart.length,
-            total: 'US$ ' + item.totalPrice,
-            status: item.status
-          });
-        });
-    };
-    getOrders();
-  }, []);
+  userOrders?.forEach((order: any) => {
+    row.push({
+      id: order._id,
+      itemsQty: order.cart.length,
+      total: 'US$ ' + order.totalPrice,
+      status: order.status
+    });
+  });
 
   return (
     <div className="w-full">
@@ -251,20 +249,22 @@ export const AllOrders = () => {
 
 export const AllRefundOrders = () => {
   const { user } = useAppSelector((state) => state.user);
-  const { orders } = useAppSelector((state) => state.order);
+  const { userOrders } = useAppSelector((state) => state.order);
   const dispatch = useAppDispatch();
   const [eligibleOrders, setEligibleOrders] = useState<any>([]);
 
   useEffect(() => {
     const getRefundedOrders = async () => {
-      // await dispatch(getAllOrdersOfUser(user._id));
+      await dispatch(getUserOrders(user!._id));
 
-      setEligibleOrders(
-        () => orders && orders.filter((item: any) => item.status === 'Processing refund')
+      setEligibleOrders(() =>
+        userOrders.filter(
+          (item: any) => item.status === 'Processing refund' || item.status === 'Refund Success'
+        )
       );
     };
     getRefundedOrders();
-  }, []);
+  }, [user, userOrders, dispatch]);
 
   const columns: any = [
     { field: 'id', headerName: 'Order ID', minWidth: 150, flex: 0.7 },
@@ -303,7 +303,7 @@ export const AllRefundOrders = () => {
       sortable: false,
       renderCell: (params: any) => {
         return (
-          <Link to={`/user/order/${params.id}`}>
+          <Link to={`/profile/order/${params.id}`}>
             <Button icon={<AiOutlineArrowRight size={20} />} />
           </Link>
         );
@@ -334,8 +334,12 @@ export const AllRefundOrders = () => {
 
 export const TrackOrder = () => {
   const { user } = useAppSelector((state) => state.user);
-  const { orders } = useAppSelector((state) => state.order);
+  const { userOrders } = useAppSelector((state) => state.order);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getUserOrders(user!._id));
+  }, [user, dispatch]);
 
   const columns: any = [
     { field: 'id', headerName: 'Order ID', minWidth: 150, flex: 0.7 },
@@ -374,7 +378,7 @@ export const TrackOrder = () => {
       sortable: false,
       renderCell: (params: any) => {
         return (
-          <Link to={`/user/track/order/${params.id}`}>
+          <Link to={`/profile/trackOrder/${params.id}`}>
             <Button icon={<MdTrackChanges size={20} />} />
           </Link>
         );
@@ -383,24 +387,14 @@ export const TrackOrder = () => {
   ];
 
   const row: any = [];
-
-  useEffect(() => {
-    const getOrders = async () => {
-      // await dispatch(getAllOrdersOfUser(user._id));
-
-      orders &&
-        orders.forEach((item: any) => {
-          row.push({
-            id: item._id,
-            itemsQty: item.cart.length,
-            total: 'US$ ' + item.totalPrice,
-            status: item.status
-          });
-        });
-    };
-
-    getOrders();
-  }, []);
+  userOrders?.forEach((item: any) => {
+    row.push({
+      id: item._id,
+      itemsQty: item.cart.length,
+      total: 'US$ ' + item.totalPrice,
+      status: item.status
+    });
+  });
 
   return (
     <div className="w-full">
@@ -416,24 +410,30 @@ export const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
   const passwordChangeHandler = async (e: any) => {
     e.preventDefault();
+    setLoading(true);
 
-    // await axiosInstance
-    //   .put(
-    //     `/user/update-user-password`,
-    //     { oldPassword, newPassword, confirmPassword },
-    //     { withCredentials: true }
-    //   )
-    //   .then((res: any) => {
-    //     toast.success(res.data.success);
-    //     setOldPassword('');
-    //     setNewPassword('');
-    //     setConfirmPassword('');
-    //   })
-    //   .catch((error: any) => {
-    //     toast.error(error.response.data.message);
-    //   });
+    await axiosInstance
+      .put(
+        `/user/update-password`,
+        { oldPassword, newPassword, confirmPassword },
+        { withCredentials: true }
+      )
+      .then((res: any) => {
+        toast.success('Password Updated.');
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setLoading(false);
+      })
+      .catch((error: any) => {
+        console.log(error);
+        toast.error(error.response.data.message);
+        setLoading(false);
+      });
   };
 
   return (
@@ -442,7 +442,7 @@ export const ChangePassword = () => {
         Change Password
       </h1>
       <div className="w-full">
-        <form aria-required onSubmit={passwordChangeHandler} className="flex flex-col items-center">
+        <form onSubmit={passwordChangeHandler} className="flex flex-col items-center">
           <div className=" w-[100%] 800px:w-[50%] mt-5">
             <label className="block pb-2">Enter your old password</label>
             <input
@@ -472,11 +472,13 @@ export const ChangePassword = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <input
-              className={`w-[95%] h-[40px] border border-[#3a24db] text-center text-[#3a24db] rounded-[3px] mt-8 cursor-pointer`}
-              required
-              value="Update"
+
+            <Button
               type="submit"
+              title="Update"
+              className={`w-[95%] h-[40px] border border-[#3a24db] text-center text-[#3a24db] rounded-[3px] mt-8 cursor-pointer`}
+              disabled={loading}
+              loading={loading}
             />
           </div>
         </form>
@@ -571,7 +573,7 @@ export const Address = () => {
             </div>
             <h1 className="text-center text-[25px] font-Poppins">Add New Address</h1>
             <div className="w-full">
-              <form aria-required onSubmit={handleSubmit} className="w-full">
+              <form onSubmit={handleSubmit} className="w-full">
                 <div className="w-full block p-4">
                   <div className="w-full pb-2">
                     <label className="block pb-2">Country</label>
@@ -682,32 +684,31 @@ export const Address = () => {
         <Button title="Add New" onClick={() => setOpen(true)} />
       </div>
       <br />
-      {user &&
-        user.addresses.map((item, index) => (
-          <div
-            className="w-full bg-white h-min 800px:h-[70px] rounded-[4px] flex items-center px-3 shadow justify-between pr-10 mb-5"
-            key={index}>
-            <div className="flex items-center">
-              <h5 className="pl-5 font-[600]">{item.addressType}</h5>
-            </div>
-            <div className="pl-8 flex items-center">
-              <h6 className="text-[12px] 800px:text-[unset]">
-                {item.address1} {item.address2}
-              </h6>
-            </div>
-            <div className="pl-8 flex items-center">
-              <h6 className="text-[12px] 800px:text-[unset]">{user?.phoneNumber}</h6>
-            </div>
-            <div className="min-w-[10%] flex items-center justify-between pl-8">
-              <Button
-                icon={<AiOutlineDelete size={25} />}
-                loading={loading}
-                className="cursor-pointer"
-                onClick={() => handleDelete(item)}
-              />
-            </div>
+      {user?.addresses.map((item, index) => (
+        <div
+          className="w-full bg-white h-min 800px:h-[70px] rounded-[4px] flex items-center px-3 shadow justify-between pr-10 mb-5"
+          key={index}>
+          <div className="flex items-center">
+            <h5 className="pl-5 font-[600]">{item.addressType}</h5>
           </div>
-        ))}
+          <div className="pl-8 flex items-center">
+            <h6 className="text-[12px] 800px:text-[unset]">
+              {item.address1} {item.address2}
+            </h6>
+          </div>
+          <div className="pl-8 flex items-center">
+            <h6 className="text-[12px] 800px:text-[unset]">{user?.phoneNumber}</h6>
+          </div>
+          <div className="min-w-[10%] flex items-center justify-between pl-8">
+            <Button
+              icon={<AiOutlineDelete size={25} />}
+              loading={loading}
+              className="cursor-pointer"
+              onClick={() => handleDelete(item)}
+            />
+          </div>
+        </div>
+      ))}
 
       {user?.addresses.length === 0 && (
         <h5 className="text-center pt-8 text-[18px]">You not have any saved address!</h5>

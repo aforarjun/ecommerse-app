@@ -60,41 +60,12 @@ export interface Seller {
 }
 
 export interface Product {
-  _id: String;
-  name: String;
-  description: String;
-  images: {
-    url: String;
-  }[];
-  category: {
-    index: Number;
-    value: String;
-  };
-  tags: String;
-  originalPrice: Number;
-  discountPrice: Number;
-  stock: Number;
-  sellerId: String;
-  seller: Seller;
-  sold_out: Number;
-  createdAt: Date;
-  reviews: {
-    user: User;
-    rating: Number;
-    comment: String;
-    productId: String;
-    createdAt: Date;
-  }[];
-  ratings: Number;
-}
-
-export interface Event {
   _id: string;
   name: string;
   description: string;
   images: string[];
   category: {
-    index: number;
+    index: string;
     value: string;
   };
   tags: string;
@@ -104,12 +75,51 @@ export interface Event {
   sellerId: string;
   seller: Seller;
   sold_out: number;
+  createdAt: Date;
+  reviews: {
+    user: User;
+    rating: number;
+    comment: string;
+    productId: string;
+    createdAt: Date;
+  }[];
+  ratings: number;
+}
+
+export interface Event extends Product {
   startDate: Date;
   endDate: Date;
-  createdAt: Date;
 }
 
 export interface Cart {
   cartItem: Product;
   qty: number;
+}
+
+export interface Order {
+  _id: string;
+  cart: Cart[];
+  shippingAddress: {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    address: {
+      country: string;
+      city: string;
+      address1: string;
+      address2: string;
+      zipCode: number;
+      addressType: string;
+    };
+  };
+  totalPrice: number;
+  user: User;
+  status: string;
+  paymentInfo: {
+    id: string;
+    status: string;
+    type: string;
+  };
+  paidAt: Date;
+  createdAt: Date;
 }

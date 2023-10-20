@@ -50,7 +50,7 @@ const userSlice = createSlice({
       })
       .addCase(registerRequest.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // activate user / register user
@@ -67,7 +67,7 @@ const userSlice = createSlice({
       .addCase(activateUser.rejected, (state, { payload }: any) => {
         state.isAuthenticated = false;
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // login user
@@ -84,7 +84,7 @@ const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, { payload }: any) => {
         state.isLoading = false;
         console.log(payload);
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
         state.isAuthenticated = false;
       });
 
@@ -101,7 +101,7 @@ const userSlice = createSlice({
       })
       .addCase(logoutUser.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // load user
@@ -121,7 +121,7 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
         state.isLoading = false;
         state.isUserLoaded = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Update user
@@ -132,7 +132,7 @@ const userSlice = createSlice({
       })
       .addCase(updateUser.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Update user Avatar
@@ -142,7 +142,7 @@ const userSlice = createSlice({
         state.successMessage = payload.message;
       })
       .addCase(updateUserAvatar.rejected, (state, { payload }: any) => {
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Update user Avatar
@@ -152,7 +152,7 @@ const userSlice = createSlice({
         state.successMessage = payload.message;
       })
       .addCase(updateUserAddress.rejected, (state, { payload }: any) => {
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Update user Avatar
@@ -162,7 +162,7 @@ const userSlice = createSlice({
         state.successMessage = payload.message;
       })
       .addCase(deleteUserAddress.rejected, (state, { payload }: any) => {
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
   }
 });
@@ -318,7 +318,7 @@ export const updateUserAddress = createAsyncThunk(
   }
 );
 
-// 7. update User Addresses
+// 7. delete User Address
 export const deleteUserAddress = createAsyncThunk(
   'user/deleteUserAddress',
   async (addressId: any, { rejectWithValue }) => {

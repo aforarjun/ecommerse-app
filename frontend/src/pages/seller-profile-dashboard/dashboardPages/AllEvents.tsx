@@ -16,7 +16,7 @@ const AllEvents = () => {
     if (seller?._id) {
       dispatch(getSellerEvents(seller._id));
     }
-  }, [dispatch]);
+  }, [seller, dispatch]);
 
   const handleDelete = (id: string) => {
     dispatch(deleteEvent(id));
@@ -58,12 +58,10 @@ const AllEvents = () => {
       headerName: '',
       type: 'number',
       sortable: false,
-      renderCell: (params: any) => {
-        const d = params.row.name;
-        const product_name = d.replace(/\s+/g, '-');
+      renderCell: (params: { id: string }) => {
         return (
           <>
-            <Link to={`/product/${product_name}`}>
+            <Link to={`/product/${params.id}?isEvent=true`}>
               <Button>
                 <AiOutlineEye size={20} />
               </Button>

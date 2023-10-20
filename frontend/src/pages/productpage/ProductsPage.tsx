@@ -13,15 +13,16 @@ const ProductsPage = () => {
   const { allProducts, isLoading } = useAppSelector((state) => state.products);
   const [data, setData] = useState<any>([]);
 
+  console.log(category);
+
   useEffect(() => {
-    if (category === null) {
-      setData(allProducts);
-    } else {
-      const products = allProducts?.filter((product: any) => product.category === category);
+    if (category === null) setData(allProducts);
+    else {
+      const products = allProducts?.filter((product: any) => product.category.value === category);
       setData(products);
     }
-    //    window.scrollTo(0,0);
-  }, [allProducts]);
+    window.scrollTo(0, 0);
+  }, [allProducts, category]);
 
   return (
     <>

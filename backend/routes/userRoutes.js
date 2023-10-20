@@ -45,7 +45,7 @@ router.get("/get-user/:userId", isAuthenticatedUser, getUserDetails);
 router.put("/update-user", isAuthenticatedUser, updateUser);
 
 // Update password    -   LOGGEDIN USER
-router.put("/update-password/:userId", isAuthenticatedUser, updatePassword);
+router.put("/update-password", isAuthenticatedUser, updatePassword);
 
 // Delete User   -   LOGGEDIN USER
 router.post("/delete-user/:userId", isAuthenticatedUser, deleteUser);

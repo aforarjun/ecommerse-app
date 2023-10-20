@@ -11,6 +11,8 @@ import seller from "./routes/sellerRoutes.js";
 import product from "./routes/productRoute.js";
 import event from "./routes/eventRoute.js";
 import couponCode from "./routes/couponCodeRoute.js";
+import orders from "./routes/orderRoute.js";
+import payment from "./routes/paymentRoute.js";
 
 const app = express();
 
@@ -43,6 +45,10 @@ app.use("/api/v2/product", product);
 app.use("/api/v2/event", event);
 
 app.use("/api/v2/coupon", couponCode);
+
+app.use("/api/v2/order", orders);
+
+app.use("/api/v2/payment", payment);
 
 // For error handling
 app.use(ErrorMiddleware);

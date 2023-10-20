@@ -32,7 +32,7 @@ const ShopInfo = ({ isOwner }: { isOwner: boolean }) => {
         console.log(error);
         setIsLoading(false);
       });
-  }, []);
+  }, [dispatch, id]);
 
   const logoutHandler = async () => {
     await dispatch(logoutSeller());

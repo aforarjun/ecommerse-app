@@ -13,8 +13,8 @@ interface InitialState {
 
 const initialState: InitialState = {
   isLoading: false,
-  allEvents: [],
-  events: [],
+  allEvents: [], // all events of a seller
+  events: [], // all events
   event: null,
   success: false,
   error: ''
@@ -56,7 +56,7 @@ const eventsSlice = createSlice({
       })
       .addCase(getEventDetails.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // get all events
@@ -70,10 +70,10 @@ const eventsSlice = createSlice({
       })
       .addCase(getAllEvents.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
-    // get all Seller products
+    // get all Seller Events
     builder
       .addCase(getSellerEvents.pending, (state) => {
         state.isLoading = true;
@@ -84,10 +84,10 @@ const eventsSlice = createSlice({
       })
       .addCase(getSellerEvents.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
-    // update product
+    // update Event
     builder
       .addCase(updateEvent.pending, (state) => {
         state.isLoading = true;
@@ -112,7 +112,7 @@ const eventsSlice = createSlice({
       })
       .addCase(updateEvent.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // delete product
@@ -123,20 +123,24 @@ const eventsSlice = createSlice({
       .addCase(deleteEvent.fulfilled, (state, { payload }: any) => {
         state.isLoading = false;
         state.events = state.events.filter((event: any) => {
-          if (event._id !== payload.eventId) {
-            return event;
+          if (event._id === payload.eventId) {
+            return false;
           }
+
+          return true;
         });
 
         state.allEvents = state.allEvents.filter((event: any) => {
-          if (event._id !== payload.eventId) {
-            return event;
+          if (event._id === payload.eventId) {
+            return false;
           }
+
+          return true;
         });
       })
       .addCase(deleteEvent.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
   }
 });
@@ -147,7 +151,7 @@ export default eventsSlice.reducer;
 // Create Event
 export const createEvent = createAsyncThunk(
   'eventss/createEvent',
-  async (body: Event, { rejectWithValue }) => {
+  async (body: any, { rejectWithValue }) => {
     try {
       const { data } = await axiosInstance.post('/event/create-event', body, {
         withCredentials: true
@@ -247,7 +251,7 @@ export const deleteEvent = createAsyncThunk(
       const { data } = await axiosInstance.delete(`/event/delete-event/${id}`, {
         withCredentials: true
       });
-      console.log(data);
+
       return data;
     } catch (error: any) {
       if (!error.response) {

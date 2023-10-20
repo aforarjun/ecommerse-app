@@ -29,6 +29,7 @@ const ShopDashBoard = () => {
           <Route path="/" element={<DashboardHero />} />
           <Route path="/all-orders" element={<AllOrders />} />
           <Route path="/order/:id" element={<OrderDetails />} />
+          <Route path="/refunds" element={<AllRefundOrders />} />
 
           <Route path="/products" element={<AllProducts />} />
           <Route path="/create-product" element={<CreateProduct />} />
@@ -36,7 +37,6 @@ const ShopDashBoard = () => {
           <Route path="/create-event" element={<CreateEvent />} />
 
           <Route path="/cupouns" element={<AllCoupons />} />
-          <Route path="/refunds" element={<AllRefundOrders />} />
 
           <Route path="/withdraw-money" element={<WithdrawMoney />} />
 

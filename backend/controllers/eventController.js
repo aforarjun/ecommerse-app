@@ -10,13 +10,29 @@ export const createEvent = CatchAsyncError(async (req, res, next) => {
   const seller = await Seller.findById(sellerId);
 
   if (!seller) {
+    const files = req.files;
+    files.forEach((file) => {
+      const filename = file.filename;
+      const filePath = `/uploaded-images/${filename}`;
+
+      fs.unlink(filePath, (err) => {
+        if (err) console.log("Error deleting file");
+        else console.log("File deleted successfully");
+      });
+    });
+
     return next(new ErrorHandler("Seller id is invalid.", 401));
   }
 
-  const event = await Event.create({
-    ...req.body,
-    seller,
+  const files = req.files;
+  const storeImages = files.map((file) => {
+    const filename = file.filename;
+    return `${process.env.API_URL}/${filename}`;
   });
+  req.body.images = storeImages;
+  req.body.category = JSON.parse(req.body.category);
+
+  const event = await Event.create({ ...req.body, seller });
 
   res.status(201).json({
     success: true,
@@ -37,7 +53,7 @@ export const updateEvent = CatchAsyncError(async (req, res, next) => {
 
   const event = await Event.updateOne(req.body);
 
-  if (event) {
+  if (!event) {
     return next(
       new ErrorHandler("Event not updated. Something went wrong", 400)
     );
@@ -50,13 +66,13 @@ export const updateEvent = CatchAsyncError(async (req, res, next) => {
   });
 });
 
-// get a Event details of a Seller
+// get a Event details
 export const getEventDetails = CatchAsyncError(async (req, res, next) => {
-  const id = req.params;
+  const { id } = req.params;
 
-  const event = await Event.findById({ _id: id });
+  const event = await Event.findById(id);
 
-  if (event) {
+  if (!event) {
     return next(new ErrorHandler("Event not exist", 400));
   }
 

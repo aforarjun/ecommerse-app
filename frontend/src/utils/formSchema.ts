@@ -90,10 +90,9 @@ export const CreateSellerSchema = yup
         address2: yup.string().default('').notRequired(),
         zipCode: yup
           .string()
-          .nullable()
-          .matches(/^[0-9]+$/, 'Must be only digits')
           .default('')
           .required('Required')
+          .matches(/^[0-9]+$/, 'Must be only digits')
       })
       .nullable()
       .default(null),
@@ -125,10 +124,9 @@ export const UpdateShopSchema = yup
       .default(''),
     phoneNumber: yup
       .string()
-      .nullable()
-      .matches(/^[0-9]+$/, 'Must be only digits')
       .default('')
-      .required('Required'),
+      .required('Required')
+      .matches(/^[0-9]+$/, 'Must be only digits'),
     address: yup
       .object()
       .shape({
@@ -152,10 +150,9 @@ export const UpdateShopSchema = yup
         address2: yup.string().default('').notRequired(),
         zipCode: yup
           .string()
-          .nullable()
-          .matches(/^[0-9]+$/, 'Must be only digits')
           .default('')
           .required('Required')
+          .matches(/^[0-9]+$/, 'Must be only digits')
       })
       .nullable()
       .default(null)
@@ -164,7 +161,7 @@ export const UpdateShopSchema = yup
 
 // create event schema
 export const CreateEventSchema = yup.object().shape({
-  images: yup.array().of(yup.string()).required('Project Images is required, (Atleast one.)'),
+  images: yup.array().of(yup.mixed().required('Project Images is required, (Atleast one.)')),
   name: yup.string().required('Project name is required.'),
   description: yup.string().required('Project description is required.'),
   category: yup
@@ -175,9 +172,21 @@ export const CreateEventSchema = yup.object().shape({
     .default(null)
     .required('Project category is required.'),
   tags: yup.string().required('Project tags is required.'),
-  originalPrice: yup.number().required('Required'),
-  discountPrice: yup.number().required('Required'),
-  stock: yup.number().required('Required'),
+  originalPrice: yup
+    .string()
+    .default('')
+    .required('Required')
+    .matches(/^[0-9]+$/, 'Must be only digits'),
+  discountPrice: yup
+    .string()
+    .default('')
+    .required('Required')
+    .matches(/^[0-9]+$/, 'Must be only digits'),
+  stock: yup
+    .string()
+    .default('')
+    .required('Required')
+    .matches(/^[0-9]+$/, 'Must be only digits'),
   startDate: yup
     .date()
     .nullable()
@@ -197,4 +206,32 @@ export const CreateEventSchema = yup.object().shape({
       );
     })
     .required('End date is required')
+});
+
+// create Product Schema
+export const CreateProductSchema = yup.object().shape({
+  images: yup.array().of(yup.mixed().required('Project Images is required, (Atleast one.)')),
+  name: yup.string().required('Project name is required.'),
+  description: yup.string().required('Project description is required.'),
+  category: yup
+    .object({
+      index: yup.number(),
+      value: yup.string()
+    })
+    .required('Project category is required.'),
+  tags: yup.string().required('Project tags is required.'),
+  originalPrice: yup
+    .string()
+    .default('')
+    .required('Required')
+    .matches(/^[0-9]+$/, 'Must be only digits'),
+  discountPrice: yup
+    .string()
+    .default('')
+    .matches(/^[0-9]+$/, 'Must be only digits'),
+  stock: yup
+    .string()
+    .default('')
+    .required('Required')
+    .matches(/^[0-9]+$/, 'Must be only digits')
 });

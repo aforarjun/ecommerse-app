@@ -5,22 +5,21 @@ import { AiOutlineArrowRight } from 'react-icons/ai';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import Loader from '../../../components/Loader';
 import Button from '../../../components/Button';
+import { getSellerOrders } from '../../../redux/reducers/ordersSlice';
 
 const AllRefundOrders = () => {
-  const { orders, isLoading } = useAppSelector((state) => state.order);
+  const { sellerOrders, isLoading } = useAppSelector((state) => state.order);
   const { seller } = useAppSelector((state) => state.seller);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // dispatch(getAllOrdersOfShop(seller._id));
-  }, [dispatch]);
+    dispatch(getSellerOrders(seller!._id));
+  }, [seller, dispatch]);
 
-  const refundOrders =
-    orders &&
-    orders.filter(
-      (item: any) => item.status === 'Processing refund' || item.status === 'Refund Success'
-    );
+  const refundOrders = sellerOrders?.filter(
+    (item: any) => item.status === 'Processing refund' || item.status === 'Refund Success'
+  );
 
   const columns: any = [
     { field: 'id', headerName: 'Order ID', minWidth: 150, flex: 0.7 },

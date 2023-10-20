@@ -236,6 +236,18 @@ export const updateUserAvatar = CatchAsyncError(async (req, res, next) => {
 
   let existsUser = await User.findById(req.user.id);
 
+  // remove already exist image
+  const existAvatar = existsUser.avatar.split(`${process.env.API_URL}/`)[1];
+  const __dirname = path.resolve();
+  fs.unlink(`${__dirname}/uploaded-images/${existAvatar}`, (err) => {
+    if (err) {
+      console.log(err, "File not deleted");
+    } else {
+      console.log("File deleted successfully");
+    }
+  });
+
+  // upload new avatar
   const filename = req.file.filename;
   const fileUrl = path.join(filename);
   existsUser.avatar = `${process.env.API_URL}/${fileUrl}`;
@@ -271,7 +283,7 @@ export const updateUser = CatchAsyncError(async (req, res, next) => {
 // *************** UPDATE User Password - LoggedIn User ***************
 export const updatePassword = CatchAsyncError(async (req, res, next) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
-  const { userId } = req.params;
+  const userId = req.user._id;
 
   const user = await User.findById(userId).select("+password");
 

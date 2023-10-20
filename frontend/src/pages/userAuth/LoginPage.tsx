@@ -41,6 +41,7 @@ function LoginPage() {
     if (payload.success) {
       navigate('/');
       toast.success('LoggedIn successfully');
+      window.location.reload();
     } else {
       toast.error(payload.data.message);
     }

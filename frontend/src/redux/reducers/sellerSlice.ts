@@ -44,7 +44,7 @@ const sellerSlice = createSlice({
       })
       .addCase(registerRequest.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Verify Seller
@@ -58,7 +58,7 @@ const sellerSlice = createSlice({
       })
       .addCase(verifySeller.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Login Seller
@@ -74,7 +74,7 @@ const sellerSlice = createSlice({
       })
       .addCase(loginSeller.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Logout Seller
@@ -107,7 +107,7 @@ const sellerSlice = createSlice({
       .addCase(loadSeller.rejected, (state, { payload }: any) => {
         state.isSeller = false;
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // Get seller info
@@ -123,7 +123,7 @@ const sellerSlice = createSlice({
       .addCase(getSellerInfo.rejected, (state, { payload }: any) => {
         state.isSeller = false;
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // update seller info
@@ -131,6 +131,16 @@ const sellerSlice = createSlice({
       state.seller = payload.seller;
       state.successMessage = payload.message;
     });
+
+    // Update seller Avatar
+    builder
+      .addCase(updateSellerAvatar.fulfilled, (state, { payload }: any) => {
+        state.seller = payload.seller;
+        state.successMessage = payload.message;
+      })
+      .addCase(updateSellerAvatar.rejected, (state, { payload }: any) => {
+        state.error = payload?.data?.message || '';
+      });
   }
 });
 
@@ -258,6 +268,25 @@ export const updateSellerInfo = createAsyncThunk(
       return data;
     } catch (error: any) {
       console.log('error seller update', error);
+      if (!error.response) {
+        throw error;
+      }
+
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
+// Update seller avatar
+export const updateSellerAvatar = createAsyncThunk(
+  'seller/updateSellerAvagtar',
+  async (body: any, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.put('/seller/update-seller-avatar', body, {
+        withCredentials: true
+      });
+      return data;
+    } catch (error: any) {
       if (!error.response) {
         throw error;
       }

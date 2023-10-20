@@ -14,6 +14,7 @@ import {
   verifySellerAccount,
 } from "../controllers/sellerController.js";
 import { isSeller } from "../middlewares/auth.js";
+import { upload } from "../multer/multer.js";
 
 const router = express.Router();
 
@@ -45,6 +46,11 @@ router.get("/get-seller/:sellerId", isSeller, getSellerDetails);
 router.put("/update-seller/:sellerId", isSeller, updateSeller);
 
 // Update Seller avatar
-router.put("/update-avatar", isSeller, updateSellerAvatar);
+router.put(
+  "/update-seller-avatar",
+  isSeller,
+  upload.single("file"),
+  updateSellerAvatar
+);
 
 export default router;

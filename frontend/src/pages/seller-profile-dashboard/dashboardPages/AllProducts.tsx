@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
@@ -16,7 +16,7 @@ const AllProducts = () => {
 
   useEffect(() => {
     dispatch(getSellerProducts(seller?._id!));
-  }, [dispatch]);
+  }, [dispatch, seller]);
 
   const handleDelete = async (id: string) => {
     const { payload } = await dispatch(deleteProduct(id));

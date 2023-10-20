@@ -43,7 +43,7 @@ const productsSlice = createSlice({
       })
       .addCase(createProduct.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload.data?.message;
       });
 
     // get product details
@@ -57,7 +57,7 @@ const productsSlice = createSlice({
       })
       .addCase(getProductDetails.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // get all products
@@ -71,7 +71,7 @@ const productsSlice = createSlice({
       })
       .addCase(getAllProducts.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // get all Seller products
@@ -85,7 +85,7 @@ const productsSlice = createSlice({
       })
       .addCase(getSellerProducts.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // update product
@@ -113,7 +113,7 @@ const productsSlice = createSlice({
       })
       .addCase(updateProduct.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // delete product
@@ -125,19 +125,23 @@ const productsSlice = createSlice({
         state.isLoading = false;
         state.products = state.products.filter((product: any) => {
           if (product._id !== payload.productId) {
-            return product;
+            return false;
           }
+
+          return true;
         });
 
         state.allProducts = state.allProducts.filter((product: any) => {
           if (product._id !== payload.productId) {
-            return product;
+            return false;
           }
+
+          return true;
         });
       })
       .addCase(deleteProduct.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        state.error = payload.data.message;
+        state.error = payload?.data?.message || '';
       });
 
     // create review product
@@ -172,7 +176,7 @@ export default productsSlice.reducer;
 // Create Product
 export const createProduct = createAsyncThunk(
   'products/createProduct',
-  async (body: Product, { rejectWithValue }) => {
+  async (body: any, { rejectWithValue }) => {
     try {
       const { data } = await axiosInstance.post('/product/create-product', body, {
         withCredentials: true

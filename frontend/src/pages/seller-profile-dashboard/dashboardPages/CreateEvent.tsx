@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
-import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -20,24 +19,9 @@ import { CreateEventSchema } from '../../../utils/formSchema';
 
 const CreateProduct = () => {
   const { seller } = useAppSelector((state) => state.seller);
-  const { isLoading, success, error } = useAppSelector((state) => state.events);
+  const { isLoading } = useAppSelector((state) => state.events);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    dispatch(clearErrors());
-  }, []);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-    if (success) {
-      toast.success('Event created successfully!');
-      navigate('/seller/dashboard/events');
-      window.location.reload();
-    }
-  }, [dispatch, error, success]);
 
   const {
     control,
@@ -51,14 +35,44 @@ const CreateProduct = () => {
   });
 
   const createEventHandle = async (data: any) => {
-    const createEventData: Event = { ...data, sellerId: seller!._id };
-    await dispatch(createEvent(createEventData));
-    // if (payload?.success) {
-    //   toast.success('Event Created successfully');
-    //   navigate('/seller/dashboard/events');
-    // } else {
-    //   toast.error(payload?.data?.message || 'Something went wrong, Event failed.');
-    // }
+    console.log(data);
+    const {
+      category,
+      description,
+      discountPrice,
+      images,
+      name,
+      originalPrice,
+      stock,
+      tags,
+      startDate,
+      endDate
+    } = data;
+
+    const newForm = new FormData();
+
+    for (const image of images) {
+      newForm.append('images', image);
+    }
+    newForm.append('description', description);
+    newForm.append('discountPrice', discountPrice);
+    newForm.append('name', name);
+    newForm.append('originalPrice', originalPrice);
+    newForm.append('sellerId', seller!._id);
+    newForm.append('stock', stock);
+    newForm.append('tags', tags);
+    newForm.append('category', JSON.stringify(category));
+    newForm.append('startDate', startDate);
+    newForm.append('endDate', endDate);
+
+    await dispatch(createEvent(newForm)).then(({ payload }) => {
+      console.log(payload);
+      if (payload.success) {
+        toast.success('Event created successfully!');
+        navigate('/seller/dashboard/events');
+        window.location.reload();
+      } else toast.error(payload.data.message);
+    });
   };
 
   return (
@@ -80,11 +94,9 @@ const CreateProduct = () => {
           control={control}
           name="description"
           error={errors.description}
-          type="text"
           label="Description"
           placeholder="Enter event Description..."
-          cols="30"
-          rows="8"
+          type="textarea"
         />
         <br />
         <InputSelect
@@ -146,7 +158,11 @@ const CreateProduct = () => {
         <br />
 
         <div className="mt-4">
-          <Button type="submit" title="Create" disabled={isLoading} loading={isLoading} />
+          <Button
+            type="submit"
+            title="Create"
+            // disabled={isLoading} loading={isLoading}
+          />
         </div>
       </form>
     </div>

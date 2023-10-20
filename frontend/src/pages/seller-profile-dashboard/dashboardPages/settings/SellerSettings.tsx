@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AiOutlineCamera } from 'react-icons/ai';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hook';
-import { axiosInstance } from '../../../../server';
-import { loadSeller, updateSellerInfo } from '../../../../redux/reducers/sellerSlice';
+
+import { updateSellerAvatar, updateSellerInfo } from '../../../../redux/reducers/sellerSlice';
 import Button from '../../../../components/Button';
 
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,33 +17,6 @@ const SellerSettings = () => {
 
   const [avatar, setAvatar] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleImage = async (e: any) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setAvatar(reader.result);
-        axiosInstance
-          .put(
-            `/shop/update-shop-avatar`,
-            { avatar: reader.result },
-            {
-              withCredentials: true
-            }
-          )
-          .then(() => {
-            dispatch(loadSeller());
-            toast.success('Avatar updated successfully!');
-          })
-          .catch((error) => {
-            toast.error(error.response.data.message);
-          });
-      }
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
-  };
 
   const {
     control,
@@ -82,6 +55,29 @@ const SellerSettings = () => {
     }
   };
 
+  const handleImage = async (e: any) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = async (e: any) => {
+      setAvatar(e.target?.result);
+      formData.append('file', file);
+
+      const { payload }: any = await dispatch(updateSellerAvatar(formData));
+
+      if (payload.success) {
+        toast.success('avatar updated successfully!');
+      } else {
+        setAvatar(seller?.avatar);
+        toast.error(payload.data.message);
+      }
+    };
+  };
+
   return (
     <div className="w-full h-[90vh] overflow-y-scroll flex flex-col items-center">
       <div className="flex w-full 800px:w-[80%] flex-col justify-center my-5">
@@ -102,10 +98,7 @@ const SellerSettings = () => {
         </div>
 
         {/* shop info */}
-        <form
-          aria-aria-required={true}
-          className="w-full flex flex-col items-center"
-          onSubmit={handleSubmit(updateHandler)}>
+        <form className="w-full flex flex-col items-center" onSubmit={handleSubmit(updateHandler)}>
           <InputText
             control={control}
             name="name"

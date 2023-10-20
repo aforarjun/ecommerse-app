@@ -1,10 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  AiFillHeart,
-  AiOutlineHeart,
-  AiOutlineMessage,
-  AiOutlineShoppingCart
-} from 'react-icons/ai';
+import { useEffect, useState } from 'react';
+import { AiOutlineMessage, AiOutlineShoppingCart } from 'react-icons/ai';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../../styles/styles';
 import { toast } from 'react-toastify';
@@ -12,39 +7,46 @@ import Ratings from '../../components/products/Ratings';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import { axiosInstance } from '../../server';
 import { getSellerProducts } from '../../redux/reducers/productsSlice';
-import { Product } from '../../utils/Interfaces';
+import { Product, Event } from '../../utils/Interfaces';
 import { addToCart } from '../../redux/reducers/cartSlice';
+// import CountDown from '../../components/events/CountDown';
+// import { addToWishlist, removeFromWishlist } from '../../redux/reducers/wishlistSlice';
 
-const ProductDetails = ({ data }: { data: Product }) => {
+type DataType = {
+  isEvent: string;
+  data: Product | Event;
+};
+
+const ProductDetails = ({ data, isEvent }: DataType) => {
   const { user, isAuthenticated } = useAppSelector((state) => state.user);
   const { products } = useAppSelector((state) => state.products);
   const { wishlist } = useAppSelector((state) => state.wishlist);
   const { cart } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
 
-  const [click, setClick] = useState(false);
+  // const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getSellerProducts(data?.seller._id));
+    dispatch(getSellerProducts(data?.sellerId));
 
-    if (wishlist && wishlist.find((i: any) => i?._id === data?._id)) {
-      setClick(true);
-    } else {
-      setClick(false);
-    }
+    // if (wishlist?.find((i: any) => i?._id === data?._id)) {
+    //   setClick(true);
+    // } else {
+    //   setClick(false);
+    // }
   }, [data, wishlist]);
 
-  const removeFromWishlistHandler = (data: any) => {
-    setClick(!click);
-    // dispatch(removeFromWishlist(data));
-  };
+  // const removeFromWishlistHandler = (data: any) => {
+  //   setClick(!click);
+  //   dispatch(removeFromWishlist(data));
+  // };
 
-  const addToWishlistHandler = (data: any) => {
-    setClick(!click);
-    // dispatch(addToWishlist(data));
-  };
+  // const addToWishlistHandler = (data: any) => {
+  //   setClick(!click);
+  //   dispatch(addToWishlist(data));
+  // };
 
   const addToCartHandler = (id: any) => {
     const isItemExists = cart.find(({ cartItem }: any) => cartItem._id === id);
@@ -61,16 +63,16 @@ const ProductDetails = ({ data }: { data: Product }) => {
     }
   };
 
-  const totalReviewsLength =
-    products && products.reduce((acc: any, product: any) => acc + product.reviews.length, 0);
+  const totalReviewsLength = products?.reduce(
+    (acc: any, product: any) => acc + product.reviews.length,
+    0
+  );
 
-  const totalRatings =
-    products &&
-    products.reduce(
-      (acc: any, product: any) =>
-        acc + product.reviews.reduce((sum: any, review: any) => sum + review.rating, 0),
-      0
-    );
+  const totalRatings = products?.reduce(
+    (acc: any, product: any) =>
+      acc + product.reviews.reduce((sum: any, review: any) => sum + review.rating, 0),
+    0
+  );
 
   const avg = totalRatings / totalReviewsLength || 0;
 
@@ -104,20 +106,22 @@ const ProductDetails = ({ data }: { data: Product }) => {
         <div className={`${styles.section} w-[90%] 800px:w-[80%]`}>
           <div className="w-full py-5">
             <div className="block w-full 800px:flex">
-              <div className="w-full 800px:w-[50%]">
-                <img src={`${data?.images[select]?.url}`} alt="" className="w-[80%]" />
-                <div className="w-full flex">
-                  {data &&
-                    data.images.map((i: any, index: number) => (
-                      <div className={`${select === 0 ? 'border' : 'null'} cursor-pointer`}>
-                        <img
-                          src={`${i?.url}`}
-                          alt=""
-                          className="h-[200px] overflow-hidden mr-3 mt-3"
-                          onClick={() => setSelect(index)}
-                        />
-                      </div>
-                    ))}
+              <div className="w-full 800px:w-[50%] flex flex-col gap-4">
+                <img src={`${data?.images[select]}`} alt="" className="w-[80%]" />
+                <div className="w-full flex gap-2">
+                  {data?.images.map((i: any, index: number) => (
+                    <div
+                      className={`${
+                        select === 0 ? 'border' : 'null'
+                      } cursor-pointer w-[100px] h-[100px]`}>
+                      <img
+                        src={`${i}`}
+                        alt=""
+                        className="overflow-hidden mr-3 mt-3 object-contain w-[100%] h-[100%]"
+                        onClick={() => setSelect(index)}
+                      />
+                    </div>
+                  ))}
                   <div className={`${select === 1 ? 'border' : 'null'} cursor-pointer`}></div>
                 </div>
               </div>
@@ -133,42 +137,12 @@ const ProductDetails = ({ data }: { data: Product }) => {
                   </h3>
                 </div>
 
-                {/* <div className="flex items-center mt-12 justify-between pr-3">
+                {isEvent && (
                   <div>
-                    <button
-                      className="bg-gradient-to-r from-teal-400 to-teal-500 text-white font-bold rounded-l px-4 py-2 shadow-lg hover:opacity-75 transition duration-300 ease-in-out"
-                      onClick={decrementCount}>
-                      -
-                    </button>
-                    <span className="bg-gray-200 text-gray-800 font-medium px-4 py-[11px]">
-                      {count}
-                    </span>
-                    <button
-                      className="bg-gradient-to-r from-teal-400 to-teal-500 text-white font-bold rounded-l px-4 py-2 shadow-lg hover:opacity-75 transition duration-300 ease-in-out"
-                      onClick={incrementCount}>
-                      +
-                    </button>
+                    <span className="font-semibold mt-2 text-green-700">Event is going on!</span>
+                    {/* <p>{data?.endDate > Date.now()}</p> */}
                   </div>
-                  <div>
-                    {click ? (
-                      <AiFillHeart
-                        size={30}
-                        className="cursor-pointer"
-                        onClick={() => removeFromWishlistHandler(data)}
-                        color={click ? 'red' : '#333'}
-                        title="Remove from wishlist"
-                      />
-                    ) : (
-                      <AiOutlineHeart
-                        size={30}
-                        className="cursor-pointer"
-                        onClick={() => addToWishlistHandler(data)}
-                        color={click ? 'red' : '#333'}
-                        title="Add to wishlist"
-                      />
-                    )}
-                  </div>
-                </div> */}
+                )}
 
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
@@ -222,7 +196,7 @@ const ProductDetailsInfo = ({
   totalReviewsLength,
   averageRating
 }: {
-  data: Product;
+  data: Product | Event;
   products: Product[];
   totalReviewsLength: string;
   averageRating: string;

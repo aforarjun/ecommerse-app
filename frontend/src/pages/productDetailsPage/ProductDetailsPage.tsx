@@ -1,35 +1,68 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useAppSelector } from '../../redux/hook';
+import { useAppDispatch } from '../../redux/hook';
 import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import ProductDetails from './ProductDetails';
-import SuggestedProduct from '../../components/products/SuggestedProduct';
-import { Event, Product } from '../../utils/Interfaces';
+import SuggestedProducts from '../../components/products/SuggestedProducts';
+
 import Loader from '../../components/Loader';
+import { getProductDetails } from '../../redux/reducers/productsSlice';
+import { getEventDetails } from '../../redux/reducers/eventsSlice';
+import ErrorCmp from '../../components/ErrorCmp';
+import { Product, Event } from '../../utils/Interfaces';
 
 const ProductDetailsPage = () => {
-  const { allProducts } = useAppSelector((state) => state.products);
-  const { allEvents } = useAppSelector((state) => state.events);
+  const dispatch = useAppDispatch();
   const { id } = useParams();
 
-  const [detailData, setDetailData] = useState<Product>();
+  const [productData, setProductData] = useState<Product | Event | null>();
+  const [error, setError] = useState<string>('');
 
   const [searchParams] = useSearchParams();
   const eventData = searchParams.get('isEvent');
 
   useEffect(() => {
-    if (!eventData) {
-      const data = allProducts?.find((product: Product) => product?._id === id);
-      setDetailData(data);
+    if (eventData === 'true') {
+      dispatch(getEventDetails(id!)).then(({ payload }) => {
+        if (payload.success) setProductData(payload.event);
+        else setError(payload.data.message);
+      });
+    } else {
+      dispatch(getProductDetails(id!)).then(({ payload }) => {
+        if (payload.success) setProductData(payload.product);
+        else setError(payload.data.message);
+      });
     }
-  }, [allProducts, allEvents]);
+
+    return () => {
+      setProductData(null);
+    };
+  }, [dispatch, id]);
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <ErrorCmp error={error} />
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <div>
       <Header />
-      {detailData ? <ProductDetails data={detailData} /> : <Loader />}
-      {!eventData && (detailData ? <SuggestedProduct data={detailData} /> : <Loader />)}
+
+      {productData ? (
+        <>
+          <ProductDetails data={productData} isEvent={eventData || ''} />
+          {!eventData && <SuggestedProducts data={productData} />}
+        </>
+      ) : (
+        <Loader />
+      )}
+
       <Footer />
     </div>
   );

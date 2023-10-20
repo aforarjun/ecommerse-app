@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import styles from '../../styles/styles';
 import Ratings from './Ratings';
 import { addToCart } from '../../redux/reducers/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../../redux/reducers/wishlistSlice';
 
 const ProductCard = ({ data, isEvent }: any) => {
   const { wishlist } = useAppSelector((state) => state.wishlist);
@@ -18,7 +19,7 @@ const ProductCard = ({ data, isEvent }: any) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (wishlist && wishlist.find((wish: any) => wish?._id === data?._id)) {
+    if (wishlist?.find((wish: any) => wish?._id === data?._id)) {
       setClick(true);
     } else {
       setClick(false);
@@ -27,20 +28,19 @@ const ProductCard = ({ data, isEvent }: any) => {
 
   const removeFromWishlistHandler = (data: any) => {
     setClick(!click);
-    // dispatch(removeFromWishlist(data));
+    dispatch(removeFromWishlist(data));
   };
 
   const addToWishlistHandler = (data: any) => {
     setClick(!click);
-    // dispatch(addToWishlist(data));
+    dispatch(addToWishlist(data));
   };
 
   const addToCartHandler = (id: string) => {
     const isItemExists = cart?.find(({ cartItem }: any) => cartItem?._id === id);
 
-    if (isItemExists) {
-      toast.error('Item already in cart!');
-    } else {
+    if (isItemExists) toast.warn('Item already in cart!');
+    else {
       if (data.stock < 1) {
         toast.error('Product stock limited!');
       } else {
@@ -58,11 +58,7 @@ const ProductCard = ({ data, isEvent }: any) => {
           to={`${
             isEvent === true ? `/product/${data?._id}?isEvent=true` : `/product/${data?._id}`
           }`}>
-          <img
-            src={`${data.images && data.images[0]?.url}`}
-            alt=""
-            className="w-full h-[170px] object-contain"
-          />
+          <img src={`${data.images[0]}`} alt="" className="w-full h-[170px] object-contain" />
         </Link>
         <Link to={`/shop/preview/${data?.seller?._id}`}>
           <h5 className={`${styles.shop_name}`}>{data?.seller.shopName}</h5>
