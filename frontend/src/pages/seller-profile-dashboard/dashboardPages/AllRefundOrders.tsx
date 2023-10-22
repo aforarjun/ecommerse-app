@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
@@ -86,7 +86,7 @@ const AllRefundOrders = () => {
         <Loader />
       ) : (
         <div className="w-full mx-8 pt-1 mt-10 bg-white">
-          <DataGrid rows={row} columns={columns} pageSize={10} disableSelectionOnClick autoHeight />
+          <DataGrid rows={row} columns={columns} disableRowSelectionOnClick autoHeight />
         </div>
       )}
     </>

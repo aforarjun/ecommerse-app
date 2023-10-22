@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { AiOutlineArrowRight, AiOutlineMoneyCollect } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { MdBorderClear } from 'react-icons/md';
-import { Button } from '@material-ui/core';
-import { DataGrid } from '@material-ui/data-grid';
+import { Button } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import styles from '../../../styles/styles';
 import { getSellerOrders } from '../../../redux/reducers/ordersSlice';
@@ -135,7 +135,7 @@ const DashboardHero = () => {
 
       <h3 className="text-[22px] font-Poppins pb-2">Latest Orders</h3>
       <div className="w-full min-h-[45vh] bg-white rounded">
-        <DataGrid rows={row} columns={columns} disableSelectionOnClick autoHeight />
+        <DataGrid rows={row} columns={columns} disableRowSelectionOnClick autoHeight />
       </div>
     </div>
   );

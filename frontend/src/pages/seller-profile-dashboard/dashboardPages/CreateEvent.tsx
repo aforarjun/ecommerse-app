@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
@@ -13,8 +12,7 @@ import {
 } from '../../../components/input-components';
 import { categoriesData } from '../../../static/data';
 import Button from '../../../components/Button';
-import { clearErrors, createEvent } from '../../../redux/reducers/eventsSlice';
-import { Event } from '../../../utils/Interfaces';
+import { createEvent } from '../../../redux/reducers/eventsSlice';
 import { CreateEventSchema } from '../../../utils/formSchema';
 
 const CreateProduct = () => {
@@ -65,7 +63,7 @@ const CreateProduct = () => {
     newForm.append('startDate', startDate);
     newForm.append('endDate', endDate);
 
-    await dispatch(createEvent(newForm)).then(({ payload }) => {
+    await dispatch(createEvent(newForm)).then(({ payload }: any) => {
       console.log(payload);
       if (payload.success) {
         toast.success('Event created successfully!');
@@ -158,11 +156,7 @@ const CreateProduct = () => {
         <br />
 
         <div className="mt-4">
-          <Button
-            type="submit"
-            title="Create"
-            // disabled={isLoading} loading={isLoading}
-          />
+          <Button type="submit" title="Create" disabled={isLoading} loading={isLoading} />
         </div>
       </form>
     </div>

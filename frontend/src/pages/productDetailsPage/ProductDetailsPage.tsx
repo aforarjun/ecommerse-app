@@ -38,7 +38,7 @@ const ProductDetailsPage = () => {
     return () => {
       setProductData(null);
     };
-  }, [dispatch, id]);
+  }, [dispatch, id, eventData]);
 
   if (error) {
     return (

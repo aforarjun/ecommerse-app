@@ -36,7 +36,7 @@ const ProductDetails = ({ data, isEvent }: DataType) => {
     // } else {
     //   setClick(false);
     // }
-  }, [data, wishlist]);
+  }, [data, wishlist, dispatch]);
 
   // const removeFromWishlistHandler = (data: any) => {
   //   setClick(!click);

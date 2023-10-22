@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AiOutlineArrowRight, AiOutlineCamera, AiOutlineDelete } from 'react-icons/ai';
 import styles from '../../styles/styles';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom';
 import { MdTrackChanges } from 'react-icons/md';
 import { RxCross1 } from 'react-icons/rx';
@@ -241,7 +241,7 @@ export const AllOrders = () => {
   return (
     <div className="w-full">
       <div className="pl-8 pt-1">
-        <DataGrid rows={row} columns={columns} disableSelectionOnClick autoHeight />
+        <DataGrid rows={row} columns={columns} disableRowSelectionOnClick autoHeight />
       </div>
     </div>
   );
@@ -326,7 +326,7 @@ export const AllRefundOrders = () => {
   return (
     <div className="w-full">
       <div className="pl-8 pt-1">
-        <DataGrid rows={row} columns={columns} autoHeight disableSelectionOnClick />
+        <DataGrid rows={row} columns={columns} autoHeight disableRowSelectionOnClick />
       </div>
     </div>
   );
@@ -399,7 +399,7 @@ export const TrackOrder = () => {
   return (
     <div className="w-full">
       <div className="pl-8 pt-1">
-        <DataGrid rows={row} columns={columns} disableSelectionOnClick autoHeight />
+        <DataGrid rows={row} columns={columns} disableRowSelectionOnClick autoHeight />
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ const ShopVerifyAccountPage = () => {
 
       verifyEmail();
     }
-  }, [token, isSeller]);
+  }, [token, isSeller, dispatch, navigate, seller?._id]);
 
   return (
     <div

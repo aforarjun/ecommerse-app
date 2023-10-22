@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { RxCross1 } from 'react-icons/rx';
 import { toast } from 'react-toastify';
@@ -131,7 +131,7 @@ const AllCoupons = () => {
             </div>
           </div>
 
-          <DataGrid rows={row} columns={columns} disableSelectionOnClick autoHeight />
+          <DataGrid rows={row} columns={columns} disableRowSelectionOnClick autoHeight />
 
           {open && (
             <div className="fixed top-0 left-0 w-full h-screen bg-[#00000062] z-[20000] flex items-center justify-center">

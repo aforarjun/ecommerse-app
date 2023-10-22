@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { Button } from '@material-ui/core';
-import { DataGrid } from '@material-ui/data-grid';
+import { Button } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { AiOutlineDelete, AiOutlineEye } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
@@ -108,7 +108,7 @@ const AllEvents = () => {
         <Loader />
       ) : (
         <div className="w-full mx-8 pt-1 mt-10 bg-white">
-          <DataGrid rows={row} columns={columns} disableSelectionOnClick autoHeight />
+          <DataGrid rows={row} columns={columns} disableRowSelectionOnClick autoHeight />
         </div>
       )}
     </>

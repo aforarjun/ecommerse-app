@@ -37,7 +37,7 @@ const DashboardSideBar = () => {
         setActive(6);
         break;
     }
-  });
+  }, [pathname, setActive]);
 
   const dashboardSideTabs = [
     {
