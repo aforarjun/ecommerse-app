@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 import { CreateSellerSchema } from '../../utils/formSchema';
 import {
   InputPassword,
-  InputNumber,
   InputSelectCountryState,
   InputText,
   UploadImage
@@ -23,10 +22,10 @@ const ShopCreatePage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (isSeller && seller) {
-      navigate(`/seller/${seller._id}`);
+    if (isSeller) {
+      navigate(`/seller/${seller?._id}`);
     }
-  }, [isSeller]);
+  }, [isSeller, seller?._id, navigate]);
 
   const [selectedCountry, setSelectedCountry] = useState<any>();
   const [states, setStates] = useState<any>([]);
@@ -36,7 +35,7 @@ const ShopCreatePage = () => {
       const code = JSON.parse(selectedCountry).index;
       setStates(() => State.getStatesOfCountry(code));
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, navigate]);
 
   const {
     control,

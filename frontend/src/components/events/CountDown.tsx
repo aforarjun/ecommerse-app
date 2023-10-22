@@ -20,7 +20,7 @@ const CountDown = ({ data }: any) => {
       // dispatch(deleteEvent(data?._id));
     }
     return () => clearTimeout(timer);
-  }, [data, new Date()]);
+  }, [data, new Date(), timeLeft]);
 
   function calculateTimeLeft() {
     const difference = +new Date(data?.endDate) - +new Date();

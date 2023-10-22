@@ -45,7 +45,7 @@ const ShopLoginPage = () => {
     if (isSeller) {
       navigate(`/seller/${seller?._id}`);
     }
-  }, [isSeller, seller?._id]);
+  }, [isSeller, seller?._id, navigate]);
 
   const {
     control,

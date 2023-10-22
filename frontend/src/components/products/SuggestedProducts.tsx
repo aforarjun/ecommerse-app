@@ -13,7 +13,11 @@ const SuggestedProducts = ({ data }: { data: Product }) => {
       (product: Product) => product.category.value === data.category.value
     );
     setSuggestedProducts(d);
-  }, [allProducts]);
+
+    return () => {
+      setSuggestedProducts([]);
+    };
+  }, [allProducts, data]);
 
   return (
     <div>
