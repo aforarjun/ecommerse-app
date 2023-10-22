@@ -10,8 +10,8 @@ export const LoginSchema = yup
       .required('Email is required')
       .test(
         'is-valid',
-        (message) => `${message.path} is invalid`,
-        (value) =>
+        (message: any) => `${message.path} is invalid`,
+        (value: any) =>
           value ? isEmailValidator(value) : new yup.ValidationError('Invalid email format')
       )
       .default(''),
@@ -30,8 +30,8 @@ export const SignupSchema = yup
       .required('Email is required')
       .test(
         'is-valid',
-        (message) => `${message.path} is invalid`,
-        (value) =>
+        (message: any) => `${message.path} is invalid`,
+        (value: any) =>
           value ? isEmailValidator(value) : new yup.ValidationError('Invalid email format')
       )
       .default(''),
@@ -57,8 +57,8 @@ export const CreateSellerSchema = yup
       .required('Email is required')
       .test(
         'is-valid',
-        (message) => `${message.path} is invalid`,
-        (value) =>
+        (message: any) => `${message.path} is invalid`,
+        (value: any) =>
           value ? isEmailValidator(value) : new yup.ValidationError('Invalid email format')
       )
       .default(''),
@@ -117,8 +117,8 @@ export const UpdateShopSchema = yup
       .required('Email is required')
       .test(
         'is-valid',
-        (message) => `${message.path} is invalid`,
-        (value) =>
+        (message: any) => `${message.path} is invalid`,
+        (value: any) =>
           value ? isEmailValidator(value) : new yup.ValidationError('Invalid email format')
       )
       .default(''),

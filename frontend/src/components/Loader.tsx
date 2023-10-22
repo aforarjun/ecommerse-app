@@ -1,4 +1,3 @@
-// import Lottie from 'lottie-react';
 import { useLottie } from 'lottie-react';
 import animationData from '../assets/animation/animation.json';
 
@@ -13,12 +12,7 @@ const Loader = () => {
   };
   const { View } = useLottie(defaultOptions);
 
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
-      {/* <Lottie options={defaultOptions} width={300} height={300} /> */}
-      {View}
-    </div>
-  );
+  return <div className="w-full h-screen flex items-center justify-center">{View}</div>;
 };
 
 export default Loader;
