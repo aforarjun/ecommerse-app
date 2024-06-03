@@ -18,6 +18,27 @@ const getVerifyToken = async (id) => {
 
   return token;
 };
+// send verification code again if account exists but not verified
+const sendVerificationCode = async (seller, req, res, next) => {
+  try {
+    const verificationToken = await getVerifyToken(seller._id);
+    const verificationUrl = `${process.env.CatchAsyncErrorFRONTEND_URL}/seller/verification/${verificationToken}`;
+
+    await sendMail({
+      email: seller.email,
+      subject: "Verification your Shop account",
+      message: `${seller.name} is not verified, please click on the link to verify your shop account: ${verificationUrl}`,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `please check your shop email:- ${seller.email} to activate your shop account!`,
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(error.message, 500));
+  }
+};
 export const createSeller = CatchAsyncError(async (req, res, next) => {
   const { email, address, ...otherSeller } = req.body;
   let sellerAddress = JSON.parse(address);
@@ -124,28 +145,6 @@ export const verifySellerAccount = CatchAsyncError(async (req, res, next) => {
   sellerToken(newSeller, res, 201);
 });
 
-// send verification code again if account exists but not verified
-const sendVerificationCode = async (seller, req, res, next) => {
-  try {
-    const verificationToken = await getVerifyToken(seller._id);
-    const verificationUrl = `${process.env.CatchAsyncErrorFRONTEND_URL}/seller/verification/${verificationToken}`;
-
-    await sendMail({
-      email: seller.email,
-      subject: "Verification your Shop account",
-      message: `${seller.name} is not verified, please click on the link to verify your shop account: ${verificationUrl}`,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: `please check your shop email:- ${seller.email} to activate your shop account!`,
-    });
-  } catch (error) {
-    console.log(error);
-    return next(new ErrorHandler(error.message, 500));
-  }
-};
-
 // *************** Login / logout Seller Account ***************
 export const loginSeller = CatchAsyncError(async (req, res, next) => {
   const { email, password } = req.body;
@@ -199,7 +198,7 @@ export const forgetPassword = CatchAsyncError(async (req, res, next) => {
   await seller.save({ validateBeforeSave: false });
 
   // reset password url
-  const resetPasswordUrl = `${req.protocol}://localhost:3000/seller/password-reset/${resetPasswordToken}`;
+  const resetPasswordUrl = `${process.env.FRONTEND_URL}/seller/password-reset/${resetPasswordToken}`;
 
   const message = `Your seller account password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
 
