@@ -49,10 +49,20 @@ const ShopCreatePage = () => {
   });
 
   const createShop = async (data: any) => {
+    console.log(data);
     const { confirmPassword, ...otherSeller } = data;
-    console.log(otherSeller);
+    const newForm = new FormData();
+
+    newForm.append('name', otherSeller.name);
+    newForm.append('email', otherSeller.email);
+    newForm.append('address', JSON.stringify(otherSeller.address));
+    newForm.append('password', otherSeller.password);
+    newForm.append('shopName', otherSeller.shopName);
+    newForm.append('phoneNumber', otherSeller.phoneNumber);
+    newForm.append('file', otherSeller.avatar);
+
     try {
-      const { payload }: any = await dispatch(registerRequest(otherSeller));
+      const { payload }: any = await dispatch(registerRequest(newForm));
       toast.success(payload.data.message);
     } catch (error: any) {
       toast.error(error?.response?.data?.message);

@@ -19,7 +19,7 @@ import { upload } from "../multer/multer.js";
 const router = express.Router();
 
 // register Shop
-router.post("/create-seller", createSeller);
+router.post("/create-seller", upload.single("file"), createSeller);
 router.post("/verify-seller", verifySellerAccount);
 
 // Login/Logout Seller

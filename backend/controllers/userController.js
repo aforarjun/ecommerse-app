@@ -48,7 +48,7 @@ export const signupUser = CatchAsyncError(async (req, res, next) => {
   const verificationToken = createVarificationToken(newUser);
 
   // verification Url
-  const verificationUrl = `${req.protocol}://localhost:3000/auth/verification/${verificationToken}`;
+  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verification/${verificationToken}`;
 
   try {
     await sendMail({
@@ -147,7 +147,7 @@ export const forgetPassword = CatchAsyncError(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // reset password url
-  const resetPasswordUrl = `${req.protocol}://localhost:3000/password-reset/${resetPasswordToken}`;
+  const resetPasswordUrl = `${process.env.FRONTEND_URL}/password-reset/${resetPasswordToken}`;
 
   const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
 

@@ -19,7 +19,8 @@ const getVerifyToken = async (id) => {
   return token;
 };
 export const createSeller = CatchAsyncError(async (req, res, next) => {
-  const { email, ...otherSeller } = req.body;
+  const { email, address, ...otherSeller } = req.body;
+  let sellerAddress = JSON.parse(address);
 
   const seller = await Seller.findOne({ email });
   const user = await User.findOne({ email });
@@ -39,6 +40,9 @@ export const createSeller = CatchAsyncError(async (req, res, next) => {
     }
   }
 
+  const filename = req.file.filename;
+  const fileUrl = path.join(filename);
+
   if (isVerifiedUser) {
     const sellerData = {
       name: user.name,
@@ -48,10 +52,7 @@ export const createSeller = CatchAsyncError(async (req, res, next) => {
       address: user.addresses.filter(
         (address) => address.addressType === "home"
       )[0],
-      avatar: {
-        public_id: "This is demo",
-        url: "profilepicurl",
-      },
+      avatar: `${process.env.API_URL}/${fileUrl}`,
       isVerified: user.isVerified,
     };
 
@@ -59,11 +60,9 @@ export const createSeller = CatchAsyncError(async (req, res, next) => {
   } else {
     newSeller = await new Seller({
       email,
+      address: sellerAddress,
       ...otherSeller,
-      avatar: {
-        public_id: "This is demo",
-        url: "profilepicurl",
-      },
+      avatar: `${process.env.API_URL}/${fileUrl}`,
     }).save();
   }
 
@@ -75,7 +74,7 @@ export const createSeller = CatchAsyncError(async (req, res, next) => {
 
   console.log(verificationToken);
   // verification Url
-  const verificationUrl = `${req.protocol}://localhost:3000/seller/verification/${verificationToken}`;
+  const verificationUrl = `${process.env.FRONTEND_URL}/seller/verification/${verificationToken}`;
 
   try {
     await sendMail({
@@ -129,7 +128,7 @@ export const verifySellerAccount = CatchAsyncError(async (req, res, next) => {
 const sendVerificationCode = async (seller, req, res, next) => {
   try {
     const verificationToken = await getVerifyToken(seller._id);
-    const verificationUrl = `${req.protocol}://localhost:3000/seller/verification/${verificationToken}`;
+    const verificationUrl = `${process.env.CatchAsyncErrorFRONTEND_URL}/seller/verification/${verificationToken}`;
 
     await sendMail({
       email: seller.email,
