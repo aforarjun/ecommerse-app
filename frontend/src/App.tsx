@@ -36,11 +36,11 @@ import { getAllEvents } from './redux/reducers/eventsSlice';
 const App = () => {
   useEffect(() => {
     (async () => {
-      await store.dispatch(loadUser());
-      await store.dispatch(loadSeller());
-
       await store.dispatch(getAllProducts());
       await store.dispatch(getAllEvents());
+
+      await store.dispatch(loadUser());
+      await store.dispatch(loadSeller());
     })();
   }, []);
 
