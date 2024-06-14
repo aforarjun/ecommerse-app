@@ -123,6 +123,7 @@ export const logoutUser = CatchAsyncError(async (req, res, next) => {
     expires: new Date(Date.now()),
     httpOnly: true,
     secure: true,
+    sameSite: "None",
   });
 
   res.status(200).json({

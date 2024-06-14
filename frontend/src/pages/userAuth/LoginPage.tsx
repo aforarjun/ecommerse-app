@@ -37,6 +37,7 @@ function LoginPage() {
 
   const Login = async (data: any) => {
     const { payload } = await dispatch(loginUser({ ...data }));
+    console.log(payload);
 
     if (payload.success) {
       navigate('/');
@@ -55,7 +56,7 @@ function LoginPage() {
         </h2>
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={handleSubmit(Login)}>
+            <form className="space-y-6">
               <InputText
                 control={control}
                 name="email"
@@ -92,7 +93,12 @@ function LoginPage() {
                 </div>
               </div>
 
-              <Button title="Sign In" type="submit" loading={isLoading} />
+              <Button
+                title="Sign In"
+                onClick={handleSubmit(Login)}
+                type="submit"
+                loading={isLoading}
+              />
 
               <div className={`${styles.noramlFlex} w-full`}>
                 <h4>Not have any account?</h4>

@@ -83,7 +83,6 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, { payload }: any) => {
         state.isLoading = false;
-        console.log(payload);
         state.error = payload?.data?.message || '';
         state.isAuthenticated = false;
       });
@@ -217,6 +216,7 @@ export const loginUser = createAsyncThunk(
       const { data } = await axiosInstance.post('/user/login-user', body, {
         withCredentials: true
       });
+      
       return data;
     } catch (error: any) {
       if (!error.response) {

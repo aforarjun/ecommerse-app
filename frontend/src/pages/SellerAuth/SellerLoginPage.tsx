@@ -85,7 +85,7 @@ const ShopLoginPage = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit(login)}>
+          <form className="space-y-6">
             <InputText
               control={control}
               name="email"
@@ -117,7 +117,12 @@ const ShopLoginPage = () => {
               </div>
             </div>
 
-            <Button title="Sign In" type="submit" loading={isLoading} />
+            <Button
+              title="Sign In"
+              type="submit"
+              onClick={handleSubmit(login)}
+              loading={isLoading}
+            />
 
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Not have any account?</h4>
